@@ -19,7 +19,7 @@ app = Flask(__name__, template_folder='templates') # Tell Flask where to find te
 
 # --- CONFIGURATION ---
 # This will now read the MONGO_URI from your .env file
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a-very-strong-default-secret-key-for-dev')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['MONGO_URI'] = os.environ.get('MONGO_URI') # <-- REMOVED THE LOCALHOST DEFAULT
 
 if not app.config['MONGO_URI']:
