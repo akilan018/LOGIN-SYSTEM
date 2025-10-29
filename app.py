@@ -42,12 +42,12 @@ try:
 
     
     # --- !! START OF SECURE ADMIN CREATION/UPDATE !! ---
-    admin_username = 'admin'  # Default admin username
-    # Get password from environment variable, NOT from code
+    # Load BOTH admin username and password from environment variables
+    admin_username = os.environ.get("ADMIN_USERNAME")
     admin_password = os.environ.get("ADMIN_PASSWORD") 
     
-    # Only try to create/update an admin if the password is provided
-    if admin_password:
+    # Only try to create/update an admin if BOTH are provided
+    if admin_username and admin_password:
         hashed_password = generate_password_hash(admin_password)
         admin_user = users_collection.find_one({'username': admin_username})
 
@@ -70,7 +70,7 @@ try:
             print(f"Admin user '{admin_username}' password has been synced with environment variable.")
     else:
         # This will show in your logs if you forget to set the variable
-        print("ADMIN_PASSWORD environment variable not set. Skipping admin creation/update.")
+        print("ADMIN_USERNAME or ADMIN_PASSWORD environment variable not set. Skipping admin creation/update.")
     # --- !! END OF SECURE ADMIN CREATION/UPDATE !! ---
 
 except Exception as e:
@@ -170,7 +170,7 @@ def login():
     try:
         session_insert = sessions_collection.insert_one({
             'user_id': user['_id'],
-            'login_time': datetime.datetime.now(ist_timezone), # Store time in ist
+            'login_time': datetime.datetime.now(utc_timezone), # Store time in UTC
             'logout_time': None
         })
         session_id = str(session_insert.inserted_id)
@@ -179,7 +179,7 @@ def login():
         token = jwt.encode({
             'user_id': str(user['_id']),
             'role': user.get('role'),
-            'exp': datetime.datetime.now(ist_timezone) + datetime.timedelta(hours=24)
+            'exp': datetime.datetime.now(utc_timezone) + datetime.timedelta(hours=24)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
         return jsonify({
@@ -205,7 +205,7 @@ def logout():
         # Find the session and update its logout time
         result = sessions_collection.update_one(
             {'_id': ObjectId(session_id), 'logout_time': None},
-            {'$set': {'logout_time': datetime.datetime.now(ist_timezone)}} # Store time in UTC
+            {'$set': {'logout_time': datetime.datetime.now(utc_timezone)}} # Store time in UTC
         )
         
         if result.matched_count == 0:
@@ -221,19 +221,22 @@ def forgot_password():
     data = request.get_json()
     username = data.get('username')
     new_password = data.get('new_password')
+    
+    # Get the admin username from env
+    admin_username = os.environ.get("ADMIN_USERNAME")
 
     if not username or not new_password:
         return jsonify({'error': 'Username and new password are required'}), 400
+        
+    # --- !! START OF NEW ADMIN-PROTECT FIX !! ---
+    # Block anyone from resetting the admin password on this page
+    if username == admin_username:
+        return jsonify({'error': "Cannot reset the admin's password from this page."}), 403 # 403 Forbidden
+    # --- !! END OF NEW ADMIN-PROTECT FIX !! ---
 
     user = users_collection.find_one({'username': username})
     if not user:
         return jsonify({'error': 'User not found'}), 404
-        
-    # --- !! START OF NEW ADMIN-PROTECT FIX !! ---
-    # Block anyone from resetting the admin password on this page
-    if user.get('username') == 'admin':
-        return jsonify({'error': "Cannot reset the admin's password from this page."}), 403 # 403 Forbidden
-    # --- !! END OF NEW ADMIN-PROTECT FIX !! ---
 
     hashed_password = generate_password_hash(new_password)
     
@@ -277,8 +280,8 @@ def get_all_users(current_user):
         print(f"--- Aggregation returned {len(users_with_sessions)} users ---")
         
         # --- IST TIME CONVERSION ---
-        # Changed format to match user request (e.g., "6:52 PM IST")
-        time_format = '%I:%M %p IST' 
+        # !! UPDATED FORMAT TO INCLUDE DATE !!
+        time_format = '%d/%m/%y, %I:%M %p IST' # DD/MM/YY, HH:MM AM/PM IST
 
         # Convert ObjectId to string and format dates to IST
         for user in users_with_sessions:
@@ -330,6 +333,7 @@ def get_all_users(current_user):
 @app.route('/admin/user/<string:user_id>', methods=['DELETE'])
 @admin_token_required
 def delete_user(current_user, user_id):
+    admin_username = os.environ.get("ADMIN_USERNAME")
     try:
         # --- !! START OF ADMIN-PROTECT FIX !! ---
         # First, find the user to check their username
@@ -338,7 +342,7 @@ def delete_user(current_user, user_id):
         if not user_to_delete:
              return jsonify({'error': 'User not found'}), 404
 
-        if user_to_delete.get('username') == 'admin':
+        if user_to_delete.get('username') == admin_username:
             return jsonify({'error': 'Cannot delete the admin user'}), 403 # 403 Forbidden
         # --- !! END OF ADMIN-PROTECT FIX !! ---
 
@@ -375,6 +379,7 @@ def delete_session(current_user, session_id):
 @admin_token_required
 def admin_reset_password(current_user, user_id):
     
+    admin_username = os.environ.get("ADMIN_USERNAME")
     # --- !! START OF ADMIN-PROTECT FIX !! ---
     try:
         # First, find the user to check their username
@@ -383,7 +388,7 @@ def admin_reset_password(current_user, user_id):
         if not user_to_reset:
              return jsonify({'error': 'User not found'}), 404
              
-        if user_to_reset.get('username') == 'admin':
+        if user_to_reset.get('username') == admin_username:
             return jsonify({'error': "Cannot reset the admin user's password"}), 403 # 403 Forbidden
     except Exception as e:
          return jsonify({'error': 'Invalid User ID', 'details': str(e)}), 400
@@ -410,8 +415,4 @@ def admin_reset_password(current_user, user_id):
     except Exception as e:
         return jsonify({'error': 'Invalid User ID or database error', 'details': str(e)}), 500
 
-# --- Main driver ---
-# This block is for running locally on your PC
-if __name__ == '__main__':
-   app.run(debug=True, port=5000)
 
