@@ -205,7 +205,7 @@ def logout():
         # Find the session and update its logout time
         result = sessions_collection.update_one(
             {'_id': ObjectId(session_id), 'logout_time': None},
-            {'$set': {'logout_time': datetime.datetime.now(ist_timezone)}} # Store time in UTC
+            {'$set': {'logout_time': datetime.datetime.now(ist_timezone)}} # Store time in IST
         )
         
         if result.matched_count == 0:
@@ -277,8 +277,8 @@ def get_all_users(current_user):
         print(f"--- Aggregation returned {len(users_with_sessions)} users ---")
         
         # --- IST TIME CONVERSION ---
-        # Changed format to match user request (e.g., "6:52 PM IST")
-        time_format = '%I:%M %p IST' 
+        # *** THIS IS THE CHANGED LINE ***
+        time_format = '%d-%m-%Y, %I:%M %p IST' # Added date format
 
         # Convert ObjectId to string and format dates to IST
         for user in users_with_sessions:
@@ -409,6 +409,3 @@ def admin_reset_password(current_user, user_id):
         return jsonify({'message': 'Password reset successful for user'}), 200
     except Exception as e:
         return jsonify({'error': 'Invalid User ID or database error', 'details': str(e)}), 500
-
-
-
