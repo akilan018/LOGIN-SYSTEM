@@ -116,8 +116,8 @@
   /* small table / general components */
   table { width:100%; border-collapse:collapse; margin-top:1rem; font-size:0.95rem; }
   
-  /* *** THIS IS THE CHANGED LINE *** */
-  th, td { border:1px solid #ddd; padding:0.6rem 0.8rem; text-align:left; vertical-align:middle; } /* Was vertical-align: top */
+  /* Centered buttons from last fix */
+  th, td { border:1px solid #ddd; padding:0.6rem 0.8rem; text-align:left; vertical-align:middle; }
 
   th { background-color:#f3f4f6; font-weight:700; font-size:0.95rem; }
 
@@ -173,7 +173,7 @@
   }
   .modal-input { width:100%; background-color:#f3f4f6; border:1px solid #d1d5db; padding:0.5rem; border-radius:0.5rem; }
 
-  /* dark mode */
+  /* --- dark mode --- */
   body.dark-mode {
     background-color:#0b1220;
     color:#fff;
@@ -190,6 +190,27 @@
   .dark-mode .password-toggle { color:#9ca3af !important; }
   .dark-mode .footer-link { color:#818cf8; }
   .dark-mode .toast { background-color:#fff; color:#111827; }
+
+  /* ** --- START OF NEW FIX --- **
+  ** Added dark mode styles for the modal
+  */
+  .dark-mode #modal-container {
+    background-color: #111827; /* Dark background */
+  }
+  .dark-mode #modal-title,
+  .dark-mode #modal-input-label {
+    color: #d1d5db; /* Light text for title & label */
+  }
+  .dark-mode #modal-message {
+    color: #9ca3af; /* Lighter text for message */
+  }
+  .dark-mode .modal-input {
+    background-color: #1f2937; /* Dark input bg */
+    border-color: #374151;   /* Dark input border */
+    color: #fff;              /* Light input text */
+  }
+  /* ** --- END OF NEW FIX --- ** */
+
 
   /* ---------- Responsive tweaks ---------- */
   @media (max-width: 640px) {
@@ -508,8 +529,7 @@
 
   // --- Login ---
   const loginBtn = document.getElementById('login-btn');
-  loginBtn.addEventListener('click', async () => {
-    const username = document.getElementById('username').value.trim();
+  loginBtn.addEventListener('click', async ().trim();
     const password = document.getElementById('password').value.trim();
     if (!username || !password) return showToast('Username and password are required');
     setLoading(loginBtn, true);
@@ -610,6 +630,8 @@
       return;
     }
     const tableRows = users.map(u => {
+      
+      // ** This is the code from the last fix, removing the "Toggle" button **
       const sessionHtml = u.sessions && u.sessions.length
         ? u.sessions.map(s => `
             <div class="flex justify-between items-center text-xs py-1">
