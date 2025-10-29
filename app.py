@@ -40,12 +40,12 @@ try:
     users_collection.create_index('username', unique=True)
     print("Connected to MongoDB and collections are ready.")
 
-    
+
     # --- !! START OF SECURE ADMIN CREATION/UPDATE !! ---
     # Load BOTH admin username and password from environment variables
     admin_username = os.environ.get("ADMIN_USERNAME")
-    admin_password = os.environ.get("ADMIN_PASSWORD") 
-    
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+
     # Only try to create/update an admin if BOTH are provided
     if admin_username and admin_password:
         hashed_password = generate_password_hash(admin_password)
@@ -93,15 +93,19 @@ def admin_token_required(f):
             token = request.headers['x-access-token']
         if not token:
             return jsonify({'error': 'Token is missing!'}), 401
-        
+
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = users_collection.find_one({'_id': ObjectId(data['user_id'])})
             if not current_user or current_user.get('role') != 'admin':
                 return jsonify({'error': 'Admin role required!'}), 403
+        except jwt.ExpiredSignatureError:
+             return jsonify({'error': 'Token has expired!'}), 401
+        except jwt.InvalidTokenError:
+             return jsonify({'error': 'Token is invalid!'}), 401
         except Exception as e:
-            return jsonify({'error': 'Token is invalid!', 'details': str(e)}), 401
-        
+            return jsonify({'error': 'Token validation error', 'details': str(e)}), 401
+
         return f(current_user, *args, **kwargs)
     return decorated
 
@@ -116,10 +120,10 @@ def register():
         return jsonify({'error': 'Username and password are required'}), 400
 
     hashed_password = generate_password_hash(password)
-    
+
     # All new registrations are 'user'
     role = 'user'
-    
+
     try:
         users_collection.insert_one({
             'username': username,
@@ -129,7 +133,9 @@ def register():
         return jsonify({'message': 'User registered successfully!'}), 201
     except Exception as e:
         # This will catch duplicate usernames
-        return jsonify({'error': 'Username already exists or database error', 'details': str(e)}), 400
+        if 'duplicate key error' in str(e).lower():
+             return jsonify({'error': 'Username already exists'}), 400
+        return jsonify({'error': 'Database error during registration', 'details': str(e)}), 500
 
 # --- LOGIN ---
 @app.route('/login', methods=['POST'])
@@ -147,21 +153,15 @@ def login():
         return jsonify({'error': 'Invalid username or password'}), 401
 
     # --- FIX for TypeError ---
-    # Get the password hash from the user document
-    pwhash = user['password']
-    
-    # Ensure the hash is a string, not bytes, before checking
+    pwhash = user.get('password', '') # Use .get() for safety
     if isinstance(pwhash, bytes):
         pwhash = pwhash.decode('utf-8')
     # --- End of FIX ---
 
     # --- !! START OF SIMPLIFIED SECURE LOGIN !! ---
-    # Check the user's entered password against the hash
     if check_password_hash(pwhash, password):
-        # Password is correct.
-        pass # Continue to session creation
+        pass # Continue
     else:
-        # Check failed
         return jsonify({'error': 'Invalid username or password'}), 401
     # --- !! END OF SIMPLIFIED SECURE LOGIN !! ---
 
@@ -174,7 +174,7 @@ def login():
             'logout_time': None
         })
         session_id = str(session_insert.inserted_id)
-        
+
         # Create JWT token
         token = jwt.encode({
             'user_id': str(user['_id']),
@@ -197,7 +197,7 @@ def login():
 def logout():
     data = request.get_json()
     session_id = data.get('session_id')
-    
+
     if not session_id:
         return jsonify({'error': 'Session ID is missing'}), 400
 
@@ -207,13 +207,20 @@ def logout():
             {'_id': ObjectId(session_id), 'logout_time': None},
             {'$set': {'logout_time': datetime.datetime.now(utc_timezone)}} # Store time in UTC
         )
-        
+
         if result.matched_count == 0:
-            return jsonify({'error': 'Session not found or already logged out'}), 404
-            
+            # It's okay if the session wasn't found or was already logged out, just return success
+            print(f"Logout attempt for session {session_id}: Not found or already logged out.")
+        else:
+             print(f"Logout successful for session {session_id}.")
+
+        # Always return success on logout attempt to avoid info leakage
         return jsonify({'message': 'Logout successful!'}), 200
     except Exception as e:
-        return jsonify({'error': 'Invalid Session ID or database error', 'details': str(e)}), 500
+         # Log the error but still return success to the client
+        print(f"Error during logout for session {session_id}: {e}")
+        return jsonify({'message': 'Logout processed.'}), 200 # Return generic success
+
 
 # --- FORGOT PASSWORD ---
 @app.route('/forgot-password', methods=['POST'])
@@ -221,25 +228,25 @@ def forgot_password():
     data = request.get_json()
     username = data.get('username')
     new_password = data.get('new_password')
-    
+
     # Get the admin username from env
     admin_username = os.environ.get("ADMIN_USERNAME")
 
     if not username or not new_password:
         return jsonify({'error': 'Username and new password are required'}), 400
-        
+
     # --- !! START OF NEW ADMIN-PROTECT FIX !! ---
-    # Block anyone from resetting the admin password on this page
     if username == admin_username:
-        return jsonify({'error': "Cannot reset the admin's password from this page."}), 403 # 403 Forbidden
+        return jsonify({'error': "Cannot reset the admin's password from this page."}), 403
     # --- !! END OF NEW ADMIN-PROTECT FIX !! ---
 
     user = users_collection.find_one({'username': username})
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
+
     hashed_password = generate_password_hash(new_password)
-    
+
     try:
         users_collection.update_one(
             {'_id': user['_id']},
@@ -254,75 +261,100 @@ def forgot_password():
 @app.route('/admin/users', methods=['GET'])
 @admin_token_required
 def get_all_users(current_user):
-    # --- DEBUGGING PRINT ---
-    print("\n--- ADMIN: /admin/users route hit ---") 
+    print("\n--- ADMIN: /admin/users route hit ---")
     try:
-        # Use aggregation pipeline to fetch users and join their sessions
         print("--- Running aggregation pipeline ---")
         pipeline = [
+            { '$match': {} }, # Match all users initially
             {
                 '$lookup': {
-                    'from': 'sessions',      # The collection to join with
-                    'localField': '_id',     # Field from the 'users' collection
-                    'foreignField': 'user_id',# Field from the 'sessions' collection
-                    'as': 'sessions'         # Output array field name
+                    'from': 'sessions',
+                    'localField': '_id',
+                    'foreignField': 'user_id',
+                    'as': 'sessions'
                 }
             },
+             # Sort sessions within each user - newest first (optional but nice)
+            {
+                '$unwind': {
+                    'path': '$sessions',
+                    'preserveNullAndEmptyArrays': True # Keep users with no sessions
+                }
+            },
+            { '$sort': { 'sessions.login_time': -1 } },
+            # Group back by user to reconstruct the sessions array
+            {
+                '$group': {
+                    '_id': '$_id',
+                    'username': { '$first': '$username' },
+                    'role': { '$first': '$role' },
+                    # Collect sessions back into an array, handle null sessions
+                     'sessions': {
+                         '$push': {
+                             '$cond': [ { '$ne': ["$sessions", None] }, "$sessions", "$$REMOVE" ]
+                         }
+                     }
+                }
+            },
+             # Sort users alphabetically by username
+            { '$sort': { 'username': 1 } },
             {
                 '$project': {
-                    # Exclude password from the output
-                    'password': 0,
+                    'password': 0, # Exclude password
                     'sessions.user_id': 0 # Exclude user_id from nested sessions
                 }
             }
         ]
         users_with_sessions = list(users_collection.aggregate(pipeline))
         print(f"--- Aggregation returned {len(users_with_sessions)} users ---")
-        
+
         # --- IST TIME CONVERSION ---
-        # !! UPDATED FORMAT TO INCLUDE DATE !!
         time_format = '%d/%m/%y, %I:%M %p IST' # DD/MM/YY, HH:MM AM/PM IST
 
-        # Convert ObjectId to string and format dates to IST
         for user in users_with_sessions:
-            user['_id'] = str(user['_id'])
-            for session in user.get('sessions', []):
-                session['_id'] = str(session['_id'])
-                
-                # --- !! START OF FINAL TIME FIX !! ---
-                
+            user['_id'] = str(user['_id']) # Convert user ID
+            # Ensure sessions is always a list, even if aggregation returns null/missing
+            sessions_list = user.get('sessions', [])
+            if not isinstance(sessions_list, list): sessions_list = [] # Safeguard
+            
+            processed_sessions = []
+            for session in sessions_list:
+                 # Check if session is a valid dictionary before processing
+                if not isinstance(session, dict): continue
+
+                session['_id'] = str(session.get('_id')) # Convert session ID safely
+
                 # Convert Login Time
                 try:
                     login_time_obj = session.get('login_time')
-                    if login_time_obj:
-                        # Make the naive datetime aware of its UTC timezone
+                    if login_time_obj and isinstance(login_time_obj, datetime.datetime):
                         aware_utc_time = login_time_obj.replace(tzinfo=utc_timezone)
-                        # Convert to IST
-                        ist_login_time = aware_utc_time.astimezone(ist_timezone) 
+                        ist_login_time = aware_utc_time.astimezone(ist_timezone)
                         session['login_time'] = ist_login_time.strftime(time_format)
                     else:
-                        session['login_time'] = '-'
+                         session['login_time'] = '-' # Handle missing or invalid type
                 except Exception as e:
-                    print(f"Error converting login_time: {e}, {type(login_time_obj)}")
-                    session['login_time'] = '-' # Default to '-' on error
+                    print(f"Error converting login_time for session {session.get('_id')}: {e}")
+                    session['login_time'] = '-'
 
                 # Convert Logout Time
                 try:
                     logout_time_obj = session.get('logout_time')
-                    if logout_time_obj:
-                        # Make the naive datetime aware of its UTC timezone
+                    if logout_time_obj and isinstance(logout_time_obj, datetime.datetime):
                         aware_utc_time = logout_time_obj.replace(tzinfo=utc_timezone)
-                        # Convert to IST
-                        ist_logout_time = aware_utc_time.astimezone(ist_timezone) 
+                        ist_logout_time = aware_utc_time.astimezone(ist_timezone)
                         session['logout_time'] = ist_logout_time.strftime(time_format)
                     else:
-                        session['logout_time'] = '-'
+                        session['logout_time'] = '-' # Handle missing or invalid type
                 except Exception as e:
-                    print(f"Error converting logout_time: {e}, {type(logout_time_obj)}")
-                    session['logout_time'] = '-' # Default to '-' on error
-                # --- !! END OF FINAL TIME FIX !! ---
-        # --- END OF IST TIME CONVERSION ---
-        
+                    print(f"Error converting logout_time for session {session.get('_id')}: {e}")
+                    session['logout_time'] = '-'
+                
+                processed_sessions.append(session) # Add processed session
+            
+            user['sessions'] = processed_sessions # Replace original sessions with processed ones
+
+
         print(f"--- Returning data for {len(users_with_sessions)} users to frontend ---")
         return jsonify(users_with_sessions), 200
     except Exception as e:
@@ -335,30 +367,16 @@ def get_all_users(current_user):
 def delete_user(current_user, user_id):
     admin_username = os.environ.get("ADMIN_USERNAME")
     try:
-        # --- !! START OF ADMIN-PROTECT FIX !! ---
-        # First, find the user to check their username
         user_to_delete = users_collection.find_one({'_id': ObjectId(user_id)})
-        
-        if not user_to_delete:
-             return jsonify({'error': 'User not found'}), 404
-
+        if not user_to_delete: return jsonify({'error': 'User not found'}), 404
         if user_to_delete.get('username') == admin_username:
-            return jsonify({'error': 'Cannot delete the admin user'}), 403 # 403 Forbidden
-        # --- !! END OF ADMIN-PROTECT FIX !! ---
+            return jsonify({'error': 'Cannot delete the admin user'}), 403
 
-        # If not admin, proceed with deletion
         delete_user_result = users_collection.delete_one({'_id': ObjectId(user_id)})
-        
-        # This check is now slightly redundant but harmless
-        if delete_user_result.deleted_count == 0:
-            return jsonify({'error': 'User not found'}), 404
+        if delete_user_result.deleted_count == 0: return jsonify({'error': 'User not found'}), 404
 
-        # Delete all sessions associated with that user
-        delete_sessions_result = sessions_collection.delete_many({'user_id': ObjectId(user_id)})
-        
-        return jsonify({
-            'message': 'User deleted. All associated sessions deleted.'
-        }), 200
+        sessions_collection.delete_many({'user_id': ObjectId(user_id)})
+        return jsonify({'message': 'User deleted. All associated sessions deleted.'}), 200
     except Exception as e:
         return jsonify({'error': 'Invalid User ID or database error', 'details': str(e)}), 500
 
@@ -368,8 +386,7 @@ def delete_user(current_user, user_id):
 def delete_session(current_user, session_id):
     try:
         result = sessions_collection.delete_one({'_id': ObjectId(session_id)})
-        if result.deleted_count == 0:
-            return jsonify({'error': 'Session not found'}), 404
+        if result.deleted_count == 0: return jsonify({'error': 'Session not found'}), 404
         return jsonify({'message': 'Session deleted successfully'}), 200
     except Exception as e:
         return jsonify({'error': 'Invalid Session ID or database error', 'details': str(e)}), 500
@@ -378,41 +395,26 @@ def delete_session(current_user, session_id):
 @app.route('/admin/user/<string:user_id>/reset-password', methods=['POST'])
 @admin_token_required
 def admin_reset_password(current_user, user_id):
-    
     admin_username = os.environ.get("ADMIN_USERNAME")
-    # --- !! START OF ADMIN-PROTECT FIX !! ---
     try:
-        # First, find the user to check their username
         user_to_reset = users_collection.find_one({'_id': ObjectId(user_id)})
-        
-        if not user_to_reset:
-             return jsonify({'error': 'User not found'}), 404
-             
+        if not user_to_reset: return jsonify({'error': 'User not found'}), 404
         if user_to_reset.get('username') == admin_username:
-            return jsonify({'error': "Cannot reset the admin user's password"}), 403 # 403 Forbidden
+            return jsonify({'error': "Cannot reset the admin user's password"}), 403
     except Exception as e:
          return jsonify({'error': 'Invalid User ID', 'details': str(e)}), 400
-    # --- !! END OF ADMIN-PROTECT FIX !! ---
 
-    # If not admin, proceed with password reset
     data = request.get_json()
     new_password = data.get('new_password')
-    
-    if not new_password:
-        return jsonify({'error': 'New password is required'}), 400
+    if not new_password: return jsonify({'error': 'New password is required'}), 400
 
     hashed_password = generate_password_hash(new_password)
-    
     try:
-        result = users_collection.update_one(
-            {'_id': ObjectId(user_id)},
-            {'$set': {'password': hashed_password}}
-        )
-        # This check is now slightly redundant but harmless
-        if result.matched_count == 0:
-            return jsonify({'error': 'User not found'}), 404
+        result = users_collection.update_one( {'_id': ObjectId(user_id)}, {'$set': {'password': hashed_password}} )
+        if result.matched_count == 0: return jsonify({'error': 'User not found'}), 404
         return jsonify({'message': 'Password reset successful for user'}), 200
     except Exception as e:
         return jsonify({'error': 'Invalid User ID or database error', 'details': str(e)}), 500
 
+# --- Production Ready: No app.run() needed, Gunicorn handles it ---
 
