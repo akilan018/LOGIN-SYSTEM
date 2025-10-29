@@ -116,7 +116,6 @@
   /* small table / general components */
   table { width:100%; border-collapse:collapse; margin-top:1rem; font-size:0.95rem; }
   
-  /* Centered buttons from last fix */
   th, td { border:1px solid #ddd; padding:0.6rem 0.8rem; text-align:left; vertical-align:middle; }
 
   th { background-color:#f3f4f6; font-weight:700; font-size:0.95rem; }
@@ -191,25 +190,21 @@
   .dark-mode .footer-link { color:#818cf8; }
   .dark-mode .toast { background-color:#fff; color:#111827; }
 
-  /* ** --- START OF NEW FIX --- **
-  ** Added dark mode styles for the modal
-  */
   .dark-mode #modal-container {
-    background-color: #111827; /* Dark background */
+    background-color: #111827;
   }
   .dark-mode #modal-title,
   .dark-mode #modal-input-label {
-    color: #d1d5db; /* Light text for title & label */
+    color: #d1d5db;
   }
   .dark-mode #modal-message {
-    color: #9ca3af; /* Lighter text for message */
+    color: #9ca3af;
   }
   .dark-mode .modal-input {
-    background-color: #1f2937; /* Dark input bg */
-    border-color: #374151;   /* Dark input border */
-    color: #fff;              /* Light input text */
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #fff;
   }
-  /* ** --- END OF NEW FIX --- ** */
 
 
   /* ---------- Responsive tweaks ---------- */
@@ -352,25 +347,25 @@
     <button id="user-logout-btn" class="danger-button w-auto px-6 py-2 mx-auto block">Logout</button>
   </div>
 
-</div> <div class="toast" id="toast-msg" role="status" aria-live="polite"></div>
+  <div class="toast" id="toast-msg" role="status" aria-live="polite"></div>
 
-<div id="modal-backdrop"></div>
-<div id="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-message">
-  <h3 id="modal-title" class="text-xl font-semibold mb-3">Confirmation</h3>
-  <p id="modal-message" class="mb-4">Are you sure?</p>
+  <div id="modal-backdrop"></div>
+  <div id="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-message">
+    <h3 id="modal-title" class="text-xl font-semibold mb-3">Confirmation</h3>
+    <p id="modal-message" class="mb-4">Are you sure?</p>
 
-  <div id="modal-input-group" class="hidden mb-3">
-    <label for="modal-input" id="modal-input-label" class="block text-sm font-medium mb-1">Enter value:</label>
-    <input type="text" id="modal-input" class="modal-input" />
+    <div id="modal-input-group" class="hidden mb-3">
+      <label for="modal-input" id="modal-input-label" class="block text-sm font-medium mb-1">Enter value:</label>
+      <input type="text" id="modal-input" class="modal-input" />
+    </div>
+
+    <div class="flex justify-end space-x-3">
+      <button id="modal-cancel-btn" class="!w-auto px-4 py-2 bg-gray-200 dark:bg-gray-600 !text-gray-800 dark:!text-gray-100 rounded-lg font-medium hover:!bg-gray-300 dark:hover:!bg-gray-500 transition">Cancel</button>
+      <button id="modal-confirm-btn" class="!w-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:!bg-blue-700 transition">Confirm</button>
+    </div>
   </div>
 
-  <div class="flex justify-end space-x-3">
-    <button id="modal-cancel-btn" class="!w-auto px-4 py-2 bg-gray-200 dark:bg-gray-600 !text-gray-800 dark:!text-gray-100 rounded-lg font-medium hover:!bg-gray-300 dark:hover:!bg-gray-500 transition">Cancel</button>
-    <button id="modal-confirm-btn" class="!w-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:!bg-blue-700 transition">Confirm</button>
-  </div>
-</div>
-
-<script>
+</div> <script>
 (function() {
   const API_URL = 'https://login-system-von4.onrender.com';
   const toastEl = document.getElementById('toast-msg');
@@ -528,8 +523,12 @@
   });
 
   // --- Login ---
+  //
+  // ** --- THIS IS THE CORRECTED CODE --- **
+  //
   const loginBtn = document.getElementById('login-btn');
-  loginBtn.addEventListener('click', async ().trim();
+  loginBtn.addEventListener('click', async () => { // <-- FIX 1: Was 'async ().trim();'
+    const username = document.getElementById('username').value.trim(); // <-- FIX 2: This line was missing
     const password = document.getElementById('password').value.trim();
     if (!username || !password) return showToast('Username and password are required');
     setLoading(loginBtn, true);
@@ -631,7 +630,6 @@
     }
     const tableRows = users.map(u => {
       
-      // ** This is the code from the last fix, removing the "Toggle" button **
       const sessionHtml = u.sessions && u.sessions.length
         ? u.sessions.map(s => `
             <div class="flex justify-between items-center text-xs py-1">
