@@ -115,7 +115,10 @@
 
   /* small table / general components */
   table { width:100%; border-collapse:collapse; margin-top:1rem; font-size:0.95rem; }
-  th, td { border:1px solid #ddd; padding:0.6rem 0.8rem; text-align:left; vertical-align:top; }
+  
+  /* *** THIS IS THE CHANGED LINE *** */
+  th, td { border:1px solid #ddd; padding:0.6rem 0.8rem; text-align:left; vertical-align:middle; } /* Was vertical-align: top */
+
   th { background-color:#f3f4f6; font-weight:700; font-size:0.95rem; }
 
   /* toast */
@@ -226,21 +229,18 @@
 
 <div id="app-wrapper">
 
-  <!-- Theme toggle (adapted for small screens) -->
   <div class="fixed top-4 right-4 z-10 hidden sm:block">
     <button id="theme-toggle" class="px-4 py-2 w-auto bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg shadow-md">
       Toggle
     </button>
   </div>
 
-  <!-- Mobile centered theme toggle (visible only on small screens) -->
   <div class="theme-toggle-mobile sm:hidden">
     <button id="theme-toggle-mobile" class="px-3 py-2 w-auto bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg shadow-sm">
       Toggle
     </button>
   </div>
 
-  <!-- Login View -->
   <div class="form-container" id="login-view" role="region" aria-label="Login view">
     <h2 class="text-3xl font-bold mb-6 text-center">Login</h2>
 
@@ -251,7 +251,6 @@
     <div class="password-wrapper">
       <input type="password" id="password" placeholder="••••••••••" autocomplete="current-password">
       <button type="button" class="password-toggle" data-target="password" aria-label="Toggle password visibility">
-        <!-- Eye Icon -->
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -267,7 +266,6 @@
     </div>
   </div>
 
-  <!-- Register View -->
   <div class="form-container hidden" id="register-view" role="region" aria-label="Register view">
     <h2 class="text-3xl font-bold mb-6 text-center">Create Account</h2>
 
@@ -278,7 +276,6 @@
     <div class="password-wrapper">
       <input type="password" id="reg-password" placeholder="Create a strong password" autocomplete="new-password">
       <button type="button" class="password-toggle" data-target="reg-password" aria-label="Toggle password visibility">
-        <!-- Eye Icon -->
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -293,7 +290,6 @@
     </div>
   </div>
 
-  <!-- Forgot Password View -->
   <div class="form-container hidden" id="forgot-view" role="region" aria-label="Forgot password view">
     <h2 class="text-3xl font-bold mb-6 text-center">Reset Password</h2>
 
@@ -304,7 +300,6 @@
     <div class="password-wrapper">
       <input type="password" id="forgot-new" placeholder="Enter a new password" autocomplete="new-password">
       <button type="button" class="password-toggle" data-target="forgot-new" aria-label="Toggle password visibility">
-        <!-- Eye Icon -->
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -319,7 +314,6 @@
     </div>
   </div>
 
-  <!-- Admin Dashboard View -->
   <div class="form-container hidden max-w-4xl" id="dashboard-view" role="region" aria-label="Admin dashboard">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-bold">Admin Dashboard</h2>
@@ -328,7 +322,6 @@
     <div id="user-table" class="overflow-x-auto"></div>
   </div>
 
-  <!-- User Logged-in View -->
   <div class="form-container hidden" id="user-view" role="region" aria-label="User view">
     <svg class="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -338,12 +331,8 @@
     <button id="user-logout-btn" class="danger-button w-auto px-6 py-2 mx-auto block">Logout</button>
   </div>
 
-</div> <!-- End #app-wrapper -->
+</div> <div class="toast" id="toast-msg" role="status" aria-live="polite"></div>
 
-<!-- Toast Notification -->
-<div class="toast" id="toast-msg" role="status" aria-live="polite"></div>
-
-<!-- Modal Backdrop & Container -->
 <div id="modal-backdrop"></div>
 <div id="modal-container" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-message">
   <h3 id="modal-title" class="text-xl font-semibold mb-3">Confirmation</h3>
