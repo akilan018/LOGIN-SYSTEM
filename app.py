@@ -218,7 +218,7 @@ def get_all_users(current_user):
         # Keep only the latest 20 messages (sorted by time)
         recent_sessions = []
         for user in users_with_sessions:
-            user['sessions'] = sorted(user.get('sessions', []), key=lambda x: x.get('login_time', '-'), reverse=True)[:20]
+            user['sessions'] = sorted(user.get('sessions', []), key=lambda x: x.get('login_time', '-'), reverse=True)[:100]
 
         return jsonify(users_with_sessions), 200
     except Exception as e:
@@ -227,3 +227,4 @@ def get_all_users(current_user):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
+
