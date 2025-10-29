@@ -8,3 +8,10 @@ python-dotenv
 certifi
 pytz
 gunicorn
+flask
+flask_pymongo
+werkzeug
+PyJWT
+flask-cors
+python-dotenv
+gunicorn
