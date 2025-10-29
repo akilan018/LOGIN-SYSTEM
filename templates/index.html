@@ -120,19 +120,19 @@
   /* Default (Mobile First): Cells act like blocks */
   thead { border: none; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
   tr { border: 1px solid #d1d5db; border-bottom: 3px solid #4f46e5; display: block; margin-bottom: 1rem; border-radius: 0.5rem; overflow: hidden; background-color: #ffffff; }
-  td { border-bottom: 1px solid #e5e7eb; display: block; font-size: .9em; text-align: right; padding: 0.75rem; position: relative; /* Needed for absolute positioning of label */ min-height: 2.5em; /* Ensure space for label */ }
-  td::before { content: attr(data-label); position: absolute; left: 0.75rem; /* Position label */ top: 0.75rem; font-weight: bold; text-transform: uppercase; color: #4f46e5; text-align: left; width: calc(40% - 1.5rem); /* Adjust width as needed */ margin-right: 0; padding-right: 10px; white-space: nowrap; }
-  td span, td div, td button { /* Ensure content flows correctly */ display: block; text-align: right; margin-left: 40%; /* Push content to the right */ padding-left: 10px; }
+  td { border-bottom: 1px solid #e5e7eb; display: block; font-size: .9em; text-align: right; padding: 0.75rem; position: relative; min-height: 2.5em; }
+  td::before { content: attr(data-label); position: absolute; left: 0.75rem; top: 0.75rem; font-weight: bold; text-transform: uppercase; color: #4f46e5; text-align: left; width: calc(40% - 1.5rem); margin-right: 0; padding-right: 10px; white-space: nowrap; }
+  td span, td div, td button { display: block; text-align: right; margin-left: 40%; padding-left: 10px; }
   td:last-child { border-bottom: 0; }
-   td.sessions-cell::before, td.actions-cell::before { content: attr(data-label); /* Show label for these too */ } /* Show label for these complex cells too */
-  td.sessions-cell, td.actions-cell { text-align: right; } /* Keep alignment consistent */
-   td.sessions-cell > div { margin-left: 40%; padding-left: 10px; } /* Indent session content */
-   td.actions-cell > button { margin-left: 40%; padding-left: 10px; width: calc(60% - 1.5rem); margin-bottom: 0.5rem; display: block; } /* Style action buttons */
+   td.sessions-cell::before, td.actions-cell::before { content: attr(data-label); }
+  td.sessions-cell, td.actions-cell { text-align: right; }
+   td.sessions-cell > div { margin-left: 40%; padding-left: 10px; }
+   td.actions-cell > button { margin-left: 40%; padding-left: 10px; width: calc(60% - 1.5rem); margin-bottom: 0.5rem; display: block; }
    td.actions-cell > button:last-child { margin-bottom: 0; }
 
    /* Session specific mobile alignment */
    .session-details { text-align: right !important; }
-   .session-delete-button { text-align: right !important; margin-left: auto !important; width: auto !important; /* Let button shrink */}
+   .session-delete-button { text-align: right !important; margin-left: auto !important; width: auto !important; }
 
 
   /* Medium screens and up: Display as a normal table */
@@ -142,13 +142,12 @@
      th { background-color: #f3f4f6; color: #4f46e5; padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb; }
     td { border: 1px solid #e5e7eb; display: table-cell; font-size: 1em; text-align: left; padding: 0.75rem; position: static; min-height: auto; }
     td::before { content: ""; display: none; position: static; width: auto; }
-    td span, td div, td button { display: inline-block; /* Reset display */ text-align: left; margin-left: 0; padding-left: 0; width: auto; } /* Reset content flow */
+    td span, td div, td button { display: inline-block; text-align: left; margin-left: 0; padding-left: 0; width: auto; }
     td.actions-cell button { margin-bottom: 0; display: inline-block; width: auto; }
     td.actions-cell button:not(:last-child) { margin-right: 0.5rem; }
     .session-details { text-align: left !important; }
     .session-delete-button { margin-left: 0 !important; }
     td.sessions-cell > div { display: flex; justify-content: space-between; align-items: center; } /* Flex layout for session row on desktop */
-
   }
 
   .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background-color: #1f2937; color: #e5e7eb; border: 1px solid #374151; padding: 0.75rem 1.25rem; border-radius: 0.5rem; z-index: 50; box-shadow: 0 4px 12px rgba(0,0,0,0.15); opacity: 0; transform: translateY(100%); transition: all 0.3s ease-out; }
@@ -165,6 +164,7 @@
   #modal-cancel-btn:hover { background-color: #d1d5db !important; }
   #modal-confirm-btn.bg-red-600 { background-color: #ef4444 !important; }
   #modal-confirm-btn.bg-red-600:hover { background-color: #dc2626 !important; }
+  /* Confirm button uses !bg-blue-600 class */
   #modal-confirm-btn.\!bg-blue-600 { background-color: #4f46e5 !important; }
   #modal-confirm-btn.\!bg-blue-600:hover { background-color: #4338ca !important; }
 
@@ -221,10 +221,8 @@
   <!-- Login View -->
   <div class="form-container" id="login-view">
     <h2 class="text-3xl font-bold mb-8 text-center">Login</h2>
-
     <label for="username">Username</label>
     <input type="text" id="username" placeholder="Enter your username">
-
     <label for="password">Password</label>
     <div class="password-wrapper">
       <input type="password" id="password" placeholder="••••••••••">
@@ -232,10 +230,8 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
       </button>
     </div>
-
     <button id="login-btn" class="mt-4">Login</button>
-
-    <div class="flex flex-col md:flex-row justify-between items-center mt-6 text-sm space-y-2 md:space-y-0"> <!-- Stack links on mobile -->
+    <div class="flex flex-col md:flex-row justify-between items-center mt-6 text-sm space-y-2 md:space-y-0">
       <a href="#" id="show-register" class="footer-link">Register</a>
       <a href="#" id="show-forgot" class="footer-link">Forgot password?</a>
     </div>
@@ -245,7 +241,6 @@
   <!-- Register View -->
   <div class="form-container hidden" id="register-view">
     <h2 class="text-3xl font-bold mb-8 text-center">Create Account</h2>
-     <!-- Content unchanged -->
     <label for="reg-username">Username</label>
     <input type="text" id="reg-username" placeholder="Choose a username">
     <label for="reg-password">Password</label>
@@ -265,7 +260,6 @@
   <!-- Forgot Password View -->
   <div class="form-container hidden" id="forgot-view">
     <h2 class="text-3xl font-bold mb-8 text-center">Reset Password</h2>
-     <!-- Content unchanged -->
     <label for="forgot-username">Username</label>
     <input type="text" id="forgot-username" placeholder="Enter your username">
     <label for="forgot-new">New Password</label>
@@ -289,7 +283,7 @@
       <button id="admin-logout-btn" class="danger-button w-auto px-4 py-2">Logout</button>
     </div>
     <div id="user-table" class="overflow-x-auto">
-         <!-- Table is rendered here by JS -->
+         <!-- Table rendered by JS -->
     </div>
   </div>
 
@@ -307,9 +301,7 @@
 <!-- Toast Notification -->
 <div class="toast" id="toast-msg"></div>
 
-<!--
-  MODAL COMPONENT
--->
+<!-- MODAL COMPONENT -->
 <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-70 z-40 hidden"></div>
 <div id="modal-container" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-6 rounded-lg shadow-xl z-50 w-11/12 max-w-md hidden">
    <!-- Content unchanged -->
@@ -324,7 +316,7 @@
     <button id="modal-confirm-btn" class="!w-auto px-4 py-2 text-white rounded-lg font-medium transition">Confirm</button>
   </div>
 </div>
-<!-- End New Modal Component -->
+<!-- End Modal Component -->
 
 
 <script>
@@ -349,13 +341,11 @@
 
   // --- Theme ---
   const themeToggle = document.getElementById('theme-toggle');
-  // Apply theme on initial load
   if (localStorage.getItem('theme') === 'dark') {
     document.body.classList.add('dark-mode');
   } else {
-      document.body.classList.remove('dark-mode'); // Default to light
+      document.body.classList.remove('dark-mode');
   }
-  // Add listener only if the toggle button exists
   if (themeToggle) {
       themeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
@@ -369,9 +359,8 @@
           themeToggle.classList.toggle('bg-gray-800', isDarkMode);
           themeToggle.classList.toggle('text-white', isDarkMode);
       }
-      updateToggleButtonAppearance(); // Set initial button appearance
+      updateToggleButtonAppearance();
   }
-
 
   // --- Loading State Helper ---
   function setLoading(button, isLoading) {
@@ -383,7 +372,7 @@
     } else {
       if (typeof button.dataset.originalText !== 'undefined') {
          button.innerHTML = button.dataset.originalText;
-      } else {
+      } else { // Fallback if dataset is missing
           if (button.id === 'login-btn') button.innerHTML = 'Login';
           else if (button.id === 'register-btn') button.innerHTML = 'Register';
           else if (button.id === 'reset-btn') button.innerHTML = 'Reset';
@@ -393,21 +382,82 @@
     }
   }
 
+
   // --- Toast ---
-  function showToast(msg) { /* Unchanged */ }
+  function showToast(msg) {
+    if (!toastEl) return;
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
+  }
 
   // --- Show/Hide Views ---
-  function showView(viewId) { /* Unchanged */ }
+  function showView(viewId) {
+    ['login-view', 'register-view', 'forgot-view', 'dashboard-view', 'user-view'].forEach(id => {
+      const view = document.querySelector(`#${id}`);
+      if(view) view.classList.add('hidden');
+    });
+    const viewToShow = document.querySelector(`#${viewId}`);
+    if(viewToShow) viewToShow.classList.remove('hidden');
+  }
 
   // --- Modal Logic ---
-  function hideModal() { /* Unchanged */ }
-  function showModalBase(title, message, confirmText = 'Confirm', confirmClass = '!bg-blue-600 hover:!bg-blue-700') { /* Unchanged */ }
-  function showConfirm(title, message, onConfirm) { /* Unchanged */ }
-  function showPrompt(title, message, inputLabel, onConfirm) { /* Unchanged */ }
-   if (modalCancelBtn) modalCancelBtn.addEventListener('click', hideModal);
-   if (modalBackdrop) modalBackdrop.addEventListener('click', hideModal);
-   if (modalConfirmBtn) modalConfirmBtn.addEventListener('click', () => { /* Unchanged */ });
-   if (modalInput) modalInput.addEventListener('keydown', (e) => { /* Unchanged */ });
+  function hideModal() {
+    if (modalBackdrop && modalContainer) {
+        modalBackdrop.classList.add('hidden');
+        modalContainer.classList.add('hidden');
+    }
+    if (modalInputGroup) modalInputGroup.classList.add('hidden');
+    if (modalInput) modalInput.value = '';
+    currentConfirmCallback = null;
+  }
+
+  // Default confirm class is now blue
+  function showModalBase(title, message, confirmText = 'Confirm', confirmClass = '!bg-blue-600 hover:!bg-blue-700') {
+    if (!modalTitle || !modalMessage || !modalConfirmBtn || !modalBackdrop || !modalContainer) return;
+
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modalConfirmBtn.textContent = confirmText;
+
+    modalConfirmBtn.className = '!w-auto px-4 py-2 text-white rounded-lg font-medium transition'; // Reset base classes
+    confirmClass.split(' ').forEach(cls => {
+        if (cls) modalConfirmBtn.classList.add(cls);
+    });
+
+    modalBackdrop.classList.remove('hidden');
+    modalContainer.classList.remove('hidden');
+  }
+
+  // ShowConfirm uses Red
+  function showConfirm(title, message, onConfirm) {
+    showModalBase(title, message, 'Delete', '!bg-red-600 hover:!bg-red-700');
+    if (modalInputGroup) modalInputGroup.classList.add('hidden');
+    currentConfirmCallback = () => { if(typeof onConfirm === 'function') onConfirm(); hideModal(); };
+  }
+
+  // ShowPrompt uses Blue
+  function showPrompt(title, message, inputLabel, onConfirm) {
+    showModalBase(title, message, 'Submit', '!bg-blue-600 hover:!bg-blue-700');
+    if (modalInputGroup && modalInputLabel && modalInput) {
+        modalInputGroup.classList.remove('hidden');
+        modalInputLabel.textContent = inputLabel;
+        modalInput.value = '';
+        modalInput.focus();
+    }
+    currentConfirmCallback = () => {
+      const value = modalInput ? modalInput.value.trim() : '';
+      if (value) { if(typeof onConfirm === 'function') onConfirm(value); hideModal(); }
+      else { showToast('Please enter a value.'); }
+    };
+  }
+
+  if (modalCancelBtn) modalCancelBtn.addEventListener('click', hideModal);
+  if (modalBackdrop) modalBackdrop.addEventListener('click', hideModal);
+  if (modalConfirmBtn) modalConfirmBtn.addEventListener('click', () => { if (currentConfirmCallback) currentConfirmCallback(); });
+  if (modalInput) modalInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && currentConfirmCallback) currentConfirmCallback(); });
+
 
   // --- View Navigation ---
   const showRegisterLink = document.getElementById('show-register');
@@ -419,66 +469,65 @@
   const backLoginLink = document.getElementById('back-login');
   if (backLoginLink) backLoginLink.addEventListener('click', (e) => { e.preventDefault(); showView('login-view'); });
 
+
   // --- PASSWORD TOGGLE LOGIC ---
-   /* Unchanged */
   const eyeIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
   const eyeOffIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064 7 9.542-7 1.866 0 3.634.605 5.006 1.625m2.38 2.38a10.05 10.05 0 01.625 3m-3.435 3.435A10.05 10.05 0 0112 19c-1.866 0-3.634-.605-5.006-1.625m9.37-9.37A10.05 10.05 0 0112 5c1.866 0 3.634.605 5.006 1.625m-9.37 9.37L5.625 5.625m12.75 12.75L5.625 5.625"></path></svg>`;
-  document.querySelectorAll('.password-toggle').forEach(button => { /* Unchanged */ });
+  document.querySelectorAll('.password-toggle').forEach(button => {
+    button.addEventListener('click', () => { /* Unchanged logic */ });
+  });
 
   // --- Register ---
   const registerBtn = document.getElementById('register-btn');
-  if (registerBtn) { registerBtn.addEventListener('click', async () => { /* Unchanged */ }); }
+  if (registerBtn) { registerBtn.addEventListener('click', async () => { /* Unchanged logic */ }); }
 
   // --- Login ---
   const loginBtn = document.getElementById('login-btn');
-  if(loginBtn) { loginBtn.addEventListener('click', async () => { /* Unchanged */ }); }
+  if(loginBtn) { loginBtn.addEventListener('click', async () => { /* Unchanged logic */ }); }
 
   // --- Forgot Password ---
   const resetBtn = document.getElementById('reset-btn');
-  if(resetBtn) { resetBtn.addEventListener('click', async () => { /* Unchanged */ }); }
+  if(resetBtn) { resetBtn.addEventListener('click', async () => { /* Unchanged logic */ }); }
 
   // --- Reusable Logout Function ---
-  async function handleLogout() { /* Unchanged */ }
+  async function handleLogout() { /* Unchanged logic */ }
   const adminLogoutBtn = document.getElementById('admin-logout-btn');
   if(adminLogoutBtn) adminLogoutBtn.addEventListener('click', handleLogout);
   const userLogoutBtn = document.getElementById('user-logout-btn');
   if(userLogoutBtn) userLogoutBtn.addEventListener('click', handleLogout);
 
   // --- Show User View ---
-  function showUserView(username) { /* Unchanged */ }
+  function showUserView(username) { /* Unchanged logic */ }
 
   // --- Dashboard ---
-  async function loadDashboard() { /* Unchanged */ }
+  async function loadDashboard() { /* Unchanged logic */ }
 
 
   // --- Render Users Table (Mobile Responsive + Brighter Date Text) ---
   function renderUsers(users) {
     const container = document.getElementById('user-table');
-     if (!container) return; // Check if container exists
+     if (!container) return;
 
-    if (!users || !users.length) { // Added check for users array existence
-      container.innerHTML = '<p class="text-center py-4">No users found.</p>'; // Centered message
+    if (!users || !users.length) {
+      container.innerHTML = '<p class="text-center py-4">No users found.</p>';
       return;
     }
     const tableRows = users.map(u => {
-      // app.py sends pre-formatted strings (Date + Time), so we just display them.
-      const sessionHtml = u.sessions && u.sessions.length // Check if sessions exist
+      // app.py sends pre-formatted strings (Date + Time)
+      const sessionHtml = u.sessions && u.sessions.length
         ? u.sessions.map(s => `
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center text-xs py-1 session-row">
-            <!-- Added date-time-text class for specific styling -->
+            <!-- Added date-time-text class -->
             <div class="mr-2 mb-1 md:mb-0 date-time-text session-details">
-              <b>Login:</b> ${s.login_time || '-'} <br> <!-- Added fallback -->
-              <b>Logout:</b> ${s.logout_time || '-'} <!-- Added fallback -->
+              <b>Login:</b> ${s.login_time || '-'} <br>
+              <b>Logout:</b> ${s.logout_time || '-'}
             </div>
-            <!-- Added check for _id existence -->
             <button class="danger-button !w-auto !text-xs !py-1 !px-2 flex-shrink-0 self-end md:self-center session-delete-button" ${s._id ? `onclick="deleteSession('${s._id}')"` : 'disabled'}>Delete</button>
           </div>
-          <hr class="my-1 border-gray-200 dark:border-gray-700 last:hidden"> <!-- Adjusted border color for themes -->
+          <hr class="my-1 border-gray-200 dark:border-gray-700 last:hidden">
         `).join('')
-        : '<span class="text-xs text-gray-500 dark:text-gray-400">No sessions</span>'; // Adjusted text color
+        : '<span class="text-xs text-gray-500 dark:text-gray-400">No sessions</span>';
 
-      // Added data-label attributes for mobile view
-      // Added checks for u._id existence
       return `
         <tr>
           <td data-label="Username" class="font-semibold whitespace-nowrap">${u.username || 'N/A'}</td>
@@ -509,12 +558,10 @@
     `;
   }
 
-
-
   // --- Admin Functions (using Modals) ---
-  window.deleteUser = (userId) => { /* Unchanged */ };
-  window.deleteSession = (sessionId) => { /* Unchanged */ };
-  window.resetPassword = (userId) => { /* Unchanged */ };
+  window.deleteUser = (userId) => { /* Unchanged logic */ };
+  window.deleteSession = (sessionId) => { /* Unchanged logic */ };
+  window.resetPassword = (userId) => { /* Unchanged logic */ };
 
 })(); // End of IIFE
 </script>
