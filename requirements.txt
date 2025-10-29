@@ -1,0 +1,10 @@
+Flask==2.2.2
+Werkzeug==2.2.3
+flask-cors
+pymongo
+bcrypt
+pyjwt
+python-dotenv
+certifi
+pytz
+gunicorn

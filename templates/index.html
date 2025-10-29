@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Login System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  html, body {
+    height: 100%;
+  }
+  body { 
+    font-family: 'Poppins', sans-serif; 
+    transition: background-color 0.3s ease, color 0.3s ease; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  
+  /* --- Base Light Mode --- */
+  body {
+    background-color: #f3f4f6;
+    color: #000;
+  }
+  .form-container {
+    background-color: #fff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    max-width: 560px;
+    width: 100%;
+    margin: auto;
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+  
+  .password-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  input[type="text"], input[type="password"] {
+    background-color: #f9fafb;
+    border: 1px solid #d1d5db;
+    color: #111827;
+    border-radius: 0.75rem;
+    width: 100%;
+    /* Padding on right (pr-12) to make space for the button */
+    padding: 0.75rem 3rem 0.75rem 1rem; 
+    outline: none;
+    transition: all 0.2s ease;
+    margin-bottom: 1.5rem; /* mb-6 */
+  }
+  .password-wrapper input {
+    margin-bottom: 0;
+  }
+  .password-wrapper {
+    margin-bottom: 1.5rem;
+  }
+
+  /* --- FINAL CORRECTED BUTTON STYLE --- */
+  .password-toggle {
+    position: absolute;
+    /* Placed on the far right */
+    right: 0.75rem; 
+    top: 50%;
+    transform: translateY(-50%);
+    width: auto; /* <-- THIS IS THE FIX. Overrides width: 100% */
+    /* Forces no background color */
+    background: none !important; 
+    border: none !important;
+    padding: 0.5rem; 
+    cursor: pointer;
+    /* Sets the icon color */
+    color: #6b7280 !important; /* text-gray-500 */
+    outline: none !important;
+    box-shadow: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Forces no color change on hover, active, or focus */
+  .password-toggle:hover,
+  .password-toggle:active,
+  .password-toggle:focus {
+    background: none !important;
+    box-shadow: none !important;
+    color: #6b7280 !important; /* Forces the SAME color */
+    outline: none !important;
+  }
+  
+  input[type="text"]:focus, input[type="password"]:focus {
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+    border-color: #4f46e5;
+  }
+
+  button {
+    width: 100%;
+    color: white;
+    background-color: #4f46e5;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    padding: 0.875rem;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+  button:hover:not(:disabled) {
+    background-color: #4338ca;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+  button:active:not(:disabled) {
+    background-color: #3730a3;
+  }
+  button:disabled {
+    background-color: #9ca3af;
+  }
+
+  .footer-link {
+    color: #4f46e5;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+  .footer-link:hover {
+    color: #3730a3;
+  }
+
+  .danger-button {
+    background-color: #dc2626;
+  }
+  .danger-button:hover:not(:disabled) {
+    background-color: #b91c1c;
+  }
+  .danger-button:active:not(:disabled) {
+    background-color: #991b1b;
+  }
+  
+  /* --- Dark Mode --- */
+  body.dark-mode {
+    background-color: #111827;
+    color: #fff;
+  }
+  .dark-mode .form-container {
+    background-color: #1f2937;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+  }
+  .dark-mode label {
+    color: #d1d5db;
+  }
+  .dark-mode input[type="text"], .dark-mode input[type="password"] {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #fff;
+  }
+  .dark-mode input[type="text"]:focus, .dark-mode input[type="password"]:focus {
+    box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.5);
+    border-color: #818cf8;
+  }
+  
+  /* --- FINAL DARK MODE BUTTON STYLE --- */
+  .dark-mode .password-toggle {
+    color: #9ca3af !important; /* text-gray-400 */
+  }
+  .dark-mode .password-toggle:hover,
+  .dark-mode .password-toggle:active,
+  .dark-mode .password-toggle:focus {
+    background: none !important;
+    color: #9ca3af !important; /* Forces the SAME color */
+  }
+
+  .dark-mode .footer-link {
+    color: #818cf8;
+  }
+  .dark-mode .footer-link:hover {
+    color: #c7d2fe;
+  }
+  .dark-mode table {
+    color: #fff;
+  }
+  .dark-mode th, .dark-mode td {
+    border-color: #4b5563;
+  }
+  .dark-mode th {
+    background-color: #374151;
+  }
+  .dark-mode .modal-input {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: #fff;
+  }
+  .dark-mode .modal-input:focus {
+     box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.5);
+    border-color: #818cf8;
+  }
+
+
+  /* --- Components --- */
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+  th, td { border: 1px solid #ddd; padding: 0.75rem; text-align: left; }
+  th { background-color: #f3f4f6; }
+  
+  .toast { 
+    position: fixed; 
+    bottom: 1.5rem; 
+    right: 1.5rem; 
+    background-color: #111827;
+    color: #fff;
+    padding: 0.75rem 1.25rem; 
+    border-radius: 0.5rem; 
+    z-index: 50;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease-out;
+  }
+  .dark-mode .toast {
+    background-color: #fff;
+    color: #111827;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.6s linear infinite;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<div id="app-wrapper">
+  
+  <div class="fixed top-4 right-4 z-10">
+    <button id="theme-toggle" class="px-4 py-2 w-auto bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg shadow-md">
+      Toggle
+    </button>
+  </div>
+
+  
+  <!-- Login View -->
+  <div class="form-container" id="login-view">
+    <h2 class="text-3xl font-bold mb-8 text-center">Login</h2>
+    
+    <label for="username">Username</label>
+    <input type="text" id="username" placeholder="Enter your username">
+    
+    <label for="password">Password</label>
+    <div class="password-wrapper">
+      <input type="password" id="password" placeholder="••••••••••">
+      <button type="button" class="password-toggle" data-target="password">
+        
+        <!-- Eye Icon -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+      </button>
+    </div>
+    
+    <button id="login-btn" class="mt-4">Login</button>
+    
+    <div class="flex justify-between items-center mt-6 text-sm">
+      <a href="#" id="show-register" class="footer-link">Register</a>
+      <a href="#" id="show-forgot" class="footer-link">Forgot password?</a>
+    </div>
+  </div>
+
+  
+  <!-- Register View -->
+  <div class="form-container hidden" id="register-view">
+    <h2 class="text-3xl font-bold mb-8 text-center">Create Account</h2>
+    
+    <label for="reg-username">Username</label>
+    <input type="text" id="reg-username" placeholder="Choose a username">
+    
+    <label for="reg-password">Password</label>
+    <div class="password-wrapper">
+      <input type="password" id="reg-password" placeholder="Create a strong password">
+      <button type="button" class="password-toggle" data-target="reg-password">
+        
+        <!-- Eye Icon -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+      </button>
+    </div>
+
+    <button id="register-btn" class="mt-4">Register</button>
+    
+    <div class="text-center mt-6 text-sm">
+      <a href="#" id="back-to-login" class="footer-link">Back to Login</a>
+    </div>
+  </div>
+
+  
+  <!-- Forgot Password View -->
+  <div class="form-container hidden" id="forgot-view">
+    <h2 class="text-3xl font-bold mb-8 text-center">Reset Password</h2>
+    
+    <label for="forgot-username">Username</label>
+    <input type="text" id="forgot-username" placeholder="Enter your username">
+    
+    <label for="forgot-new">New Password</label>
+    <div class="password-wrapper">
+      <input type="password" id="forgot-new" placeholder="Enter a new password">
+      <button type="button" class="password-toggle" data-target="forgot-new">
+        
+        <!-- Eye Icon -->
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+      </button>
+    </div>
+
+    <button id="reset-btn" class="mt-4">Reset</button>
+    
+    <div class="text-center mt-6 text-sm">
+      <a href="#" id="back-login" class="footer-link">Back to Login</a>
+    </div>
+  </div>
+
+  
+  <!-- Admin Dashboard View -->
+  <div class="form-container hidden max-w-4xl" id="dashboard-view">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold">Admin Dashboard</h2>
+      <button id="admin-logout-btn" class="danger-button w-auto px-4 py-2">Logout</button>
+    </div>
+    <div id="user-table" class="overflow-x-auto"></div>
+  </div>
+
+  
+  <!-- User Logged-in View -->
+  <div class="form-container hidden" id="user-view">
+    <svg class="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <h2 class="text-2xl font-bold mb-4 text-center mt-4">Login Successful!</h2>
+    <h3 id="welcome-username" class="text-xl text-center mb-6">Welcome!</h3>
+    <button id="user-logout-btn" class="danger-button w-auto px-6 py-2 mx-auto block">Logout</button>
+  </div>
+  
+</div> <!-- End #app-wrapper -->
+
+<!-- Toast Notification -->
+<div class="toast" id="toast-msg"></div>
+
+<!-- 
+  MODAL COMPONENT 
+-->
+<div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
+<div id="modal-container" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl z-50 w-11/12 max-w-md hidden">
+  <h3 id="modal-title" class="text-xl font-semibold mb-4">Confirmation</h3>
+  <p id="modal-message" class="mb-6">Are you sure?</p>
+  
+  <!-- For prompt -->
+  <div id="modal-input-group" class="hidden mb-4">
+    <label for="modal-input" id="modal-input-label" class="block text-sm font-medium mb-1">Enter value:</label>
+    <input type="text" id="modal-input" class="modal-input w-full bg-gray-100 border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+  </div>
+
+  <!-- Buttons -->
+  <div class="flex justify-end space-x-4">
+    <button id="modal-cancel-btn" class="!w-auto px-4 py-2 bg-gray-200 dark:bg-gray-600 !text-gray-800 dark:!text-gray-100 rounded-lg font-medium hover:!bg-gray-300 dark:hover:!bg-gray-500 transition">Cancel</button>
+    <button id="modal-confirm-btn" class="!w-auto px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:!bg-blue-700 transition">Confirm</button>
+  </div>
+</div>
+<!-- End New Modal Component -->
+
+
+<script>
+(function() {
+  const API_URL = 'http://localhost:5000';
+  const toastEl = document.getElementById('toast-msg');
+  let toastTimer;
+
+  // --- Modal Element Selectors ---
+  const modalBackdrop = document.getElementById('modal-backdrop');
+  const modalContainer = document.getElementById('modal-container');
+  const modalTitle = document.getElementById('modal-title');
+  const modalMessage = document.getElementById('modal-message');
+  const modalInputGroup = document.getElementById('modal-input-group');
+  const modalInputLabel = document.getElementById('modal-input-label');
+  const modalInput = document.getElementById('modal-input');
+  const modalCancelBtn = document.getElementById('modal-cancel-btn');
+  const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+  let currentConfirmCallback = null;
+
+
+  // --- Theme ---
+  const themeToggle = document.getElementById('theme-toggle');
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+  }
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+  });
+
+  // --- Loading State Helper ---
+  function setLoading(button, isLoading) {
+    if (isLoading) {
+      button.dataset.originalText = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner"></span> Loading...';
+    } else {
+      button.disabled = false;
+      button.innerHTML = button.dataset.originalText;
+    }
+  }
+
+  // --- Toast ---
+  function showToast(msg) {
+    clearTimeout(toastTimer); 
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(() => { toastEl.classList.remove('show'); }, 3000);
+  }
+
+  // --- Show/Hide Views ---
+  function showView(viewId) {
+    ['login-view', 'register-view', 'forgot-view', 'dashboard-view', 'user-view'].forEach(id => {
+      const view = document.querySelector(`#${id}`);
+      if(view) view.classList.add('hidden');
+    });
+    const viewToShow = document.querySelector(`#${viewId}`);
+    if(viewToShow) viewToShow.classList.remove('hidden');
+  }
+
+  // --- Modal Logic ---
+  function hideModal() {
+    modalBackdrop.classList.add('hidden');
+    modalContainer.classList.add('hidden');
+    modalInputGroup.classList.add('hidden');
+    modalInput.value = '';
+    currentConfirmCallback = null;
+  }
+  
+  // Base function to configure and show the modal
+  function showModalBase(title, message, confirmText = 'Confirm', confirmClass = '!bg-blue-600 hover:!bg-blue-700') {
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modalConfirmBtn.textContent = confirmText;
+    
+    // Reset classes and apply new ones
+    modalConfirmBtn.className = '!w-auto px-4 py-2 text-white rounded-lg font-medium transition';
+    modalConfirmBtn.className += ` ${confirmClass}`; 
+
+    modalBackdrop.classList.remove('hidden');
+    modalContainer.classList.remove('hidden');
+  }
+
+  // Function to show a confirmation dialog
+  function showConfirm(title, message, onConfirm) {
+    showModalBase(title, message, 'Delete', '!bg-red-600 hover:!bg-red-700');
+    modalInputGroup.classList.add('hidden');
+    
+    currentConfirmCallback = () => {
+      onConfirm(); // Call the passed-in function
+      hideModal();
+    };
+  }
+
+  // Function to show a prompt dialog
+  function showPrompt(title, message, inputLabel, onConfirm) {
+    showModalBase(title, message, 'Submit', '!bg-blue-600 hover:!bg-blue-700');
+    modalInputGroup.classList.remove('hidden');
+    modalInputLabel.textContent = inputLabel;
+    modalInput.value = '';
+    modalInput.focus();
+    
+    currentConfirmCallback = () => {
+      const value = modalInput.value.trim();
+      if (value) {
+        onConfirm(value);
+        hideModal();
+      } else {
+        showToast('Please enter a value.');
+      }
+    };
+  }
+  
+  // Add event listeners for modal buttons
+  modalCancelBtn.addEventListener('click', hideModal);
+  modalBackdrop.addEventListener('click', hideModal);
+  modalConfirmBtn.addEventListener('click', () => {
+    if (currentConfirmCallback) {
+      currentConfirmCallback();
+    }
+  });
+  modalInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && currentConfirmCallback) {
+      currentConfirmCallback();
+    }
+  });
+  // --- End Modal Logic ---
+
+
+  // --- View Navigation ---
+  document.getElementById('show-register').addEventListener('click', (e) => { e.preventDefault(); showView('register-view'); });
+  document.getElementById('back-to-login').addEventListener('click', (e) => { e.preventDefault(); showView('login-view'); });
+  document.getElementById('show-forgot').addEventListener('click', (e) => { e.preventDefault(); showView('forgot-view'); });
+  document.getElementById('back-login').addEventListener('click', (e) => { e.preventDefault(); showView('login-view'); });
+
+  
+  // --- PASSWORD TOGGLE LOGIC ---
+  const eyeIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>`;
+  const eyeOffIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064 7 9.542-7 1.866 0 3.634.605 5.006 1.625m2.38 2.38a10.05 10.05 0 01.625 3m-3.435 3.435A10.05 10.05 0 0112 19c-1.866 0-3.634-.605-5.006-1.625m9.37-9.37A10.05 10.05 0 0112 5c1.866 0 3.634.605 5.006 1.625m-9.37 9.37L5.625 5.625m12.75 12.75L5.625 5.625"></path></svg>`;
+
+  document.querySelectorAll('.password-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const targetId = button.dataset.target;
+      const targetInput = document.getElementById(targetId);
+      if (!targetInput) return;
+
+      if (targetInput.type === 'password') {
+        targetInput.type = 'text';
+        button.innerHTML = eyeOffIcon;
+      } else {
+        targetInput.type = 'password';
+        button.innerHTML = eyeIcon;
+      }
+    });
+  });
+
+
+  // --- Register ---
+  const registerBtn = document.getElementById('register-btn');
+  registerBtn.addEventListener('click', async () => {
+    const username = document.getElementById('reg-username').value;
+    const password = document.getElementById('reg-password').value;
+    if (!username || !password) return showToast('Username and password are required');
+    
+    setLoading(registerBtn, true);
+    try {
+      const res = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      showToast(res.ok ? data.message : data.error);
+      if (res.ok) showView('login-view');
+    } catch (err) { showToast('Error: Could not connect to server.'); } 
+    finally { setLoading(registerBtn, false); }
+  });
+
+  // --- Login ---
+  const loginBtn = document.getElementById('login-btn');
+  loginBtn.addEventListener('click', async () => {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    if (!username || !password) return showToast('Username and password are required');
+
+    setLoading(loginBtn, true);
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('session_id', data.session_id);
+        if (data.role === 'admin') loadDashboard();
+        else showUserView(username);
+      } else {
+        showToast(data.error);
+      }
+    } catch (err) { showToast('Error: Could not connect to server.'); } 
+    finally { setLoading(loginBtn, false); }
+  });
+
+  // --- Forgot Password ---
+  const resetBtn = document.getElementById('reset-btn');
+  resetBtn.addEventListener('click', async () => {
+    const username = document.getElementById('forgot-username').value;
+    const new_password = document.getElementById('forgot-new').value;
+    if (!username || !new_password) return showToast('Username and new password are required');
+
+    setLoading(resetBtn, true);
+    try {
+      const res = await fetch(`${API_URL}/forgot-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, new_password })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.message);
+        showView('login-view');
+      } else { showToast(data.error); }
+    } catch (err) { showToast('Error: Could not connect to server.'); } 
+    finally { setLoading(resetBtn, false); }
+  });
+
+  // --- Reusable Logout Function ---
+  async function handleLogout() {
+    const session_id = localStorage.getItem('session_id');
+    try {
+      await fetch(`${API_URL}/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id })
+      });
+    } catch (err) { console.error('Logout failed:', err); } 
+    finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('session_id');
+      showView('login-view');
+    }
+  }
+  document.getElementById('admin-logout-btn').addEventListener('click', handleLogout);
+  document.getElementById('user-logout-btn').addEventListener('click', handleLogout);
+
+  // --- Show User View ---
+  function showUserView(username) {
+    document.getElementById('welcome-username').textContent = `Welcome, ${username}!`;
+    showView('user-view');
+  }
+
+  // --- Dashboard ---
+  async function loadDashboard() {
+    const token = localStorage.getItem('token');
+    if (!token) { showView('login-view'); return; }
+    
+    try {
+      const res = await fetch(`${API_URL}/admin/users`, { headers: { 'x-access-token': token } });
+      if (res.ok) {
+        const users = await res.json();
+        renderUsers(users);
+        showView('dashboard-view');
+      } else {
+        showToast('Session expired or access denied.');
+        localStorage.removeItem('token');
+        localStorage.removeItem('session_id');
+        showView('login-view');
+      }
+    } catch (err) {
+      showToast('Error: Could not load dashboard.');
+      showView('login-view');
+    }
+  }
+  
+  /*
+    REMOVED THE formatDate HELPER FUNCTION AS IT'S NO LONGER NEEDED.
+    app.py is now sending a pre-formatted string.
+  */
+
+
+  // --- UPDATED Render Users Table ---
+  function renderUsers(users) {
+    const container = document.getElementById('user-table');
+    if (!users.length) {
+      container.innerHTML = '<p>No users found.</p>';
+      return;
+    }
+    // Using an array and .map for cleaner HTML generation
+    const tableRows = users.map(u => {
+      
+      // --- !! START OF FIX !! ---
+      // We no longer use formatDate(). We just display the string
+      // s.login_time directly, as it's pre-formatted by app.py.
+      // --- !! END OF FIX !! ---
+
+      const sessionHtml = u.sessions.length
+        ? u.sessions.map(s => `
+          <div class="flex justify-between items-center text-xs py-1">
+            <div class="mr-2">
+              <b>Login:</b> ${s.login_time} <br>
+              <b>Logout:</b> ${s.logout_time}
+            </div>
+            <button class="danger-button !w-auto !text-xs !py-1 !px-2 flex-shrink-0" onclick="deleteSession('${s._id}')">Delete Session</button>
+          </div>
+          <hr class="my-1 border-gray-400 dark:border-gray-600 last:hidden">
+        `).join('')
+        : 'No sessions';
+
+      return `
+        <tr>
+          <td class="font-semibold whitespace-nowrap">${u.username}</td>
+          <td class="min-w-[300px]">${sessionHtml}</td>
+          <td class="space-y-2 min-w-[150px]">
+            <button class="danger-button !w-full !text-sm !py-1" onclick="deleteUser('${u._id}')">Delete User</button>
+            <button class="!w-full !bg-yellow-600 hover:!bg-yellow-700 !text-sm !py-1" onclick="resetPassword('${u._id}')">Reset Password</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <div class="max-w-full overflow-x-auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Sessions</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+
+  // --- UPDATED Admin Functions (using Modals) ---
+  
+  window.deleteUser = (userId) => {
+    showConfirm('Delete User', 'Are you sure you want to delete this user? This will also delete all their sessions.', async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(`${API_URL}/admin/user/${userId}`, {
+          method: 'DELETE',
+          headers: { 'x-access-token': token }
+        });
+        const data = await res.json();
+        showToast(res.ok ? data.message : data.error);
+        loadDashboard();
+      } catch (err) {
+        showToast('Error connecting to server.');
+      }
+    });
+  }
+  
+  window.deleteSession = (sessionId) => {
+    showConfirm('Delete Session', 'Are you sure you want to delete this specific session?', async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(`${API_URL}/admin/session/${sessionId}`, {
+          method: 'DELETE',
+          headers: { 'x-access-token': token }
+        });
+        const data = await res.json();
+        showToast(res.ok ? data.message : data.error);
+        loadDashboard(); // Refresh the list
+      } catch (err) {
+        showToast('Error connecting to server.');
+      }
+    });
+  }
+
+  window.resetPassword = (userId) => {
+    showPrompt('Reset Password', `Enter a new password for this user:`, 'New Password', async (newPass) => {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(`${API_URL}/admin/user/${userId}/reset-password`, {
+          method: 'POST',
+          headers: { 'x-access-token': token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ new_password: newPass })
+        });
+        const data = await res.json();
+        showToast(res.ok ? data.message : data.error);
+      } catch (err) {
+        showToast('Error connecting to server.');
+      }
+    });
+  }
+
+})(); // End of IIFE
+</script>
+</body>
+</html>
+
