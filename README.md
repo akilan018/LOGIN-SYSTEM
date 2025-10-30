@@ -1,7 +1,9 @@
 # 🔐 Secure Authentication System with Admin Dashboard
 
-A **full-stack secure user authentication and management system** built using **Python (Flask)** and **MongoDB**.  
-It provides **role-based access control (Admin/User)**, **secure password hashing**, **JWT-based session management**, and a **comprehensive Admin Dashboard** for managing users and monitoring sessions.
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![GitHub](https://img.shields.io/badge/GitHub-akilan018--LOGIN--SYSTEM-blue?logo=github)](https://github.com/akilan018/LOGIN-SYSTEM)
+
+A full-stack secure user authentication and management system built using Python (Flask) and MongoDB.
 
 > 🧠 Developed during my internship at **CodeC**.
 
