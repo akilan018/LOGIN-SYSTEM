@@ -24,7 +24,9 @@
     -moz-osx-font-smoothing:grayscale;
   }
 
-  /* container */
+  /* Critical Fix: Ensure hidden class actually hides elements */
+  .hidden { display: none !important; }
+
   .form-container {
     background-color: #fff;
     box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
@@ -51,31 +53,14 @@
     font-size:1rem;
     box-sizing:border-box;
   }
-  .password-wrapper input { margin-bottom:0; }
 
-  /* password toggle button */
   .password-toggle {
     position:absolute;
     right:0.75rem;
     top:50%;
     transform:translateY(-50%);
-    width:auto;
-    background:none !important;
-    border:none !important;
-    padding:0.5rem;
     cursor:pointer;
-    color:#6b7280 !important;
-    outline:none !important;
-    box-shadow:none !important;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:0.5rem;
-  }
-
-  input[type="text"]:focus, input[type="password"]:focus {
-    box-shadow:0 0 0 2px rgba(99,102,241,0.12);
-    border-color:#4f46e5;
+    color:#6b7280;
   }
 
   button.primary {
@@ -88,46 +73,18 @@
     cursor:pointer;
     border:none;
     transition:all 0.18s ease;
-    font-size:1rem;
   }
-  button.primary:hover:not(:disabled) { background-color:#4338ca; box-shadow:0 4px 6px -1px rgba(0,0,0,0.08); transform:translateY(-1px); }
-  button.primary:disabled { background-color:#9ca3af; cursor:not-allowed; }
+  button.primary:hover:not(:disabled) { background-color:#4338ca; }
 
-  .footer-link { color:#4f46e5; font-weight:500; transition:color 0.15s ease; font-size:0.95rem; }
-  .danger-button {
-    background-color:#dc2626;
-    color:white;
-    border-radius:0.5rem;
-    padding:0.5rem 0.75rem;
-    border:none;
-    cursor:pointer;
-    font-weight:600;
-  }
+  .footer-link { color:#4f46e5; font-weight:500; text-decoration: none; }
+  .footer-link:hover { text-decoration: underline; }
 
-  table { width:100%; border-collapse:collapse; margin-top:1rem; font-size:0.95rem; }
-  th, td { border:1px solid #ddd; padding:0.6rem 0.8rem; text-align:left; vertical-align:middle; }
-  th { background-color:#f3f4f6; font-weight:700; }
+  /* Dark Mode Styles */
+  body.dark-mode { background-color:#0b1220; color:#fff; }
+  .dark-mode .form-container { background-color:#111827; }
+  .dark-mode label { color:#d1d5db; }
+  .dark-mode input { background-color:#1f2937; border-color:#374151; color:#fff; }
 
-  /* toast */
-  .toast {
-    position:fixed;
-    bottom:1rem;
-    right:1rem;
-    background-color:#111827;
-    color:#fff;
-    padding:0.65rem 0.95rem;
-    border-radius:0.5rem;
-    z-index:50;
-    box-shadow:0 4px 12px rgba(0,0,0,0.15);
-    opacity:0;
-    transform:translateY(100%);
-    transition:all 0.28s ease-out;
-    font-size:0.95rem;
-  }
-  .toast.show { opacity:1; transform:translateY(0); }
-
-  /* spinner */
-  @keyframes spin { to { transform: rotate(360deg); } }
   .spinner {
     display:inline-block;
     width:1rem;
@@ -139,47 +96,12 @@
     margin-right:0.5rem;
     vertical-align:middle;
   }
-
-  /* modal */
-  #modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:40; display:none; }
-  #modal-container {
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    background:#fff;
-    z-index:50;
-    padding:1.25rem;
-    border-radius:0.75rem;
-    width:92%;
-    max-width:420px;
-    display:none;
-  }
-
-  /* --- dark mode --- */
-  body.dark-mode { background-color:#0b1220; color:#fff; }
-  .dark-mode .form-container { background-color:#111827; }
-  .dark-mode label { color:#d1d5db; }
-  .dark-mode input[type="text"], .dark-mode input[type="password"] { background-color:#1f2937; border-color:#374151; color:#fff; }
-  .dark-mode .toast { background-color:#fff; color:#111827; }
-  .dark-mode #modal-container { background-color: #111827; }
-
-  @media (max-width: 640px) {
-    .form-container { padding:1.25rem; }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<div id="app-wrapper">
-  <div class="fixed top-4 right-4 z-10 hidden sm:block">
-    <button id="theme-toggle" class="px-4 py-2 w-auto bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg shadow-md">Toggle</button>
-  </div>
-
-  <div class="theme-toggle-mobile sm:hidden text-center mb-4">
-    <button id="theme-toggle-mobile" class="px-3 py-2 w-auto bg-white dark:bg-gray-800 text-gray-800 dark:text-white rounded-lg shadow-sm">Toggle</button>
-  </div>
-
+<div id="app-wrapper" class="w-full flex justify-center">
   <div class="form-container" id="login-view">
     <h2 class="text-3xl font-bold mb-6 text-center">Login</h2>
     <label for="username">Username</label>
@@ -190,7 +112,7 @@
       <button type="button" class="password-toggle" data-target="password">👁️</button>
     </div>
     <button id="login-btn" class="primary">Login</button>
-    <div class="flex justify-between items-center mt-4 text-sm">
+    <div class="flex justify-between mt-4 text-sm">
       <a href="#" id="show-register" class="footer-link">Register</a>
       <a href="#" id="show-forgot" class="footer-link">Forgot password?</a>
     </div>
@@ -202,7 +124,7 @@
     <input type="text" id="reg-username" placeholder="Choose a username">
     <label for="reg-password">Password</label>
     <div class="password-wrapper">
-      <input type="password" id="reg-password" placeholder="Create a strong password">
+      <input type="password" id="reg-password" placeholder="Create password">
       <button type="button" class="password-toggle" data-target="reg-password">👁️</button>
     </div>
     <button id="register-btn" class="primary">Register</button>
@@ -214,103 +136,53 @@
   <div class="form-container hidden" id="forgot-view">
     <h2 class="text-3xl font-bold mb-6 text-center">Reset Password</h2>
     <label for="forgot-username">Username</label>
-    <input type="text" id="forgot-username" placeholder="Enter your username">
+    <input type="text" id="forgot-username" placeholder="Your username">
     <label for="forgot-new">New Password</label>
     <div class="password-wrapper">
-      <input type="password" id="forgot-new" placeholder="Enter a new password">
+      <input type="password" id="forgot-new" placeholder="New password">
       <button type="button" class="password-toggle" data-target="forgot-new">👁️</button>
     </div>
-    <button id="reset-btn" class="primary">Reset</button>
+    <button id="reset-btn" class="primary">Reset Password</button>
     <div class="text-center mt-4 text-sm">
       <a href="#" id="back-login" class="footer-link">Back to Login</a>
     </div>
   </div>
 
-  <div class="form-container hidden max-w-4xl" id="dashboard-view">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl font-bold">Admin Dashboard</h2>
-      <button id="admin-logout-btn" class="danger-button">Logout</button>
-    </div>
-    <div id="user-table" class="overflow-x-auto"></div>
-  </div>
-
   <div class="form-container hidden" id="user-view">
     <h2 class="text-2xl font-bold mb-4 text-center">Login Successful!</h2>
     <h3 id="welcome-username" class="text-xl text-center mb-6">Welcome!</h3>
-    <button id="user-logout-btn" class="danger-button mx-auto block">Logout</button>
-  </div>
-
-  <div class="toast" id="toast-msg"></div>
-  <div id="modal-backdrop"></div>
-  <div id="modal-container">
-    <h3 id="modal-title" class="text-xl font-semibold mb-3">Confirmation</h3>
-    <p id="modal-message" class="mb-4"></p>
-    <div id="modal-input-group" class="hidden mb-3">
-        <input type="text" id="modal-input" class="w-full p-2 border rounded dark:bg-gray-700" />
-    </div>
-    <div class="flex justify-end space-x-3">
-      <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-200 rounded">Cancel</button>
-      <button id="modal-confirm-btn" class="px-4 py-2 bg-blue-600 text-white rounded">Confirm</button>
-    </div>
+    <button id="user-logout-btn" class="primary bg-red-600 hover:bg-red-700">Logout</button>
   </div>
 </div>
 
 <script>
 (function() {
   const API_URL = 'https://login-system-von4.onrender.com';
-  const toastEl = document.getElementById('toast-msg');
-  let toastTimer;
 
-  // Theme
-  const toggleTheme = () => {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-  };
-  document.getElementById('theme-toggle').onclick = toggleTheme;
-  document.getElementById('theme-toggle-mobile').onclick = toggleTheme;
-  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-
-  // Helpers
-  function showToast(msg) {
-    clearTimeout(toastTimer);
-    toastEl.textContent = msg;
-    toastEl.classList.add('show');
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
-  }
-
+  // Navigation Logic
   function showView(viewId) {
-    ['login-view','register-view','forgot-view','dashboard-view','user-view'].forEach(id => {
-      document.getElementById(id).classList.add('hidden');
-    });
+    const views = ['login-view','register-view','forgot-view','user-view'];
+    views.forEach(id => document.getElementById(id).classList.add('hidden'));
     document.getElementById(viewId).classList.remove('hidden');
   }
 
-  function setLoading(btn, isLoading) {
-    if (isLoading) {
-      btn.dataset.text = btn.innerHTML;
-      btn.innerHTML = '<span class="spinner"></span>';
-      btn.disabled = true;
-    } else {
-      btn.innerHTML = btn.dataset.text;
-      btn.disabled = false;
-    }
-  }
+  // Event Listeners
+  document.getElementById('show-register').onclick = (e) => { e.preventDefault(); showView('register-view'); };
+  document.getElementById('show-forgot').onclick = (e) => { e.preventDefault(); showView('forgot-view'); };
+  document.getElementById('back-to-login').onclick = (e) => { e.preventDefault(); showView('login-view'); };
+  document.getElementById('back-login').onclick = (e) => { e.preventDefault(); showView('login-view'); };
 
-  // Navigation
-  document.getElementById('show-register').onclick = () => showView('register-view');
-  document.getElementById('back-to-login').onclick = () => showView('login-view');
-  document.getElementById('show-forgot').onclick = () => showView('forgot-view');
-  document.getElementById('back-login').onclick = () => showView('login-view');
-
-  // --- LOGIN (CORRECTED) ---
-  const loginBtn = document.getElementById('login-btn');
-  loginBtn.addEventListener('click', async () => {
+  // Login Logic
+  document.getElementById('login-btn').onclick = async () => {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
+    const btn = document.getElementById('login-btn');
 
-    if (!username || !password) return showToast('Username and password are required');
-    
-    setLoading(loginBtn, true);
+    if (!username || !password) return alert('Fill all fields');
+
+    btn.innerHTML = '<span class="spinner"></span> Logging in...';
+    btn.disabled = true;
+
     try {
       const res = await fetch(`${API_URL}/login`, {
         method: 'POST',
@@ -319,107 +191,28 @@
       });
       const data = await res.json();
       if (res.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('session_id', data.session_id);
-        if (data.role === 'admin') loadDashboard();
-        else {
-          document.getElementById('welcome-username').textContent = `Welcome, ${username}!`;
-          showView('user-view');
-        }
+        document.getElementById('welcome-username').textContent = `Welcome, ${username}!`;
+        showView('user-view');
       } else {
-        showToast(data.error || 'Login failed');
+        alert(data.error || 'Login failed');
       }
-    } catch (err) {
-      showToast('Connection error');
-    } finally {
-      setLoading(loginBtn, false);
+    } catch (err) { alert('Server error'); }
+    finally {
+      btn.innerHTML = 'Login';
+      btn.disabled = false;
     }
-  });
-
-  // Register
-  document.getElementById('register-btn').onclick = async () => {
-    const username = document.getElementById('reg-username').value.trim();
-    const password = document.getElementById('reg-password').value.trim();
-    const btn = document.getElementById('register-btn');
-    setLoading(btn, true);
-    try {
-        const res = await fetch(`${API_URL}/register`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ username, password })
-        });
-        const data = await res.json();
-        showToast(res.ok ? 'Registered successfully' : data.error);
-        if (res.ok) showView('login-view');
-    } catch (e) { showToast('Error'); }
-    finally { setLoading(btn, false); }
   };
 
-  // Reset
-  document.getElementById('reset-btn').onclick = async () => {
-    const username = document.getElementById('forgot-username').value.trim();
-    const new_password = document.getElementById('forgot-new').value.trim();
-    const btn = document.getElementById('reset-btn');
-    setLoading(btn, true);
-    try {
-        const res = await fetch(`${API_URL}/forgot-password`, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ username, new_password })
-        });
-        showToast(res.ok ? 'Password reset' : 'Failed');
-        if (res.ok) showView('login-view');
-    } catch (e) { showToast('Error'); }
-    finally { setLoading(btn, false); }
-  };
-
-  // Logout
-  async function logout() {
-    const session_id = localStorage.getItem('session_id');
-    await fetch(`${API_URL}/logout`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ session_id })
-    });
-    localStorage.clear();
-    showView('login-view');
-  }
-  document.getElementById('admin-logout-btn').onclick = logout;
-  document.getElementById('user-logout-btn').onclick = logout;
-
-  // Admin Dashboard
-  async function loadDashboard() {
-    const token = localStorage.getItem('token');
-    const res = await fetch(`${API_URL}/admin/users`, { headers: { 'x-access-token': token } });
-    if (res.ok) {
-        const users = await res.json();
-        renderUsers(users);
-        showView('dashboard-view');
-    }
-  }
-
-  function renderUsers(users) {
-    const table = document.getElementById('user-table');
-    table.innerHTML = `<table><thead><tr><th>User</th><th>Actions</th></tr></thead><tbody>
-        ${users.map(u => `<tr><td>${u.username}</td><td><button class="danger-button" onclick="deleteUser('${u._id}')">Delete</button></td></tr>`).join('')}
-    </tbody></table>`;
-  }
-
-  window.deleteUser = async (id) => {
-    if(!confirm('Delete user?')) return;
-    const token = localStorage.getItem('token');
-    await fetch(`${API_URL}/admin/user/${id}`, { method: 'DELETE', headers: { 'x-access-token': token } });
-    loadDashboard();
-  };
-
-  // Toggle Password
+  // Password Visibility Toggle
   document.querySelectorAll('.password-toggle').forEach(btn => {
     btn.onclick = () => {
-        const input = document.getElementById(btn.dataset.target);
-        input.type = input.type === 'password' ? 'text' : 'password';
+      const input = document.getElementById(btn.dataset.target);
+      input.type = input.type === 'password' ? 'text' : 'password';
     };
   });
 
+  // Logout
+  document.getElementById('user-logout-btn').onclick = () => showView('login-view');
 })();
 </script>
 </body>
