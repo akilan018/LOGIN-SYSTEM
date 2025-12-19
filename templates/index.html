@@ -4,16 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Secure Login System</title>
-<!-- External Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   /* ---------- GLOBAL RESET & THEME ---------- */
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  
   html, body { height: 100%; width: 100%; }
   
   body {
@@ -29,11 +26,11 @@
 
   .hidden { display: none !important; }
 
-  /* ---------- THE CORE CARD STRUCTURE (FIXED TO MATCH IMAGE) ---------- */
+  /* ---------- CARD STRUCTURE ---------- */
   .form-container {
     background-color: #ffffff;
     border-radius: 2rem;
-    padding: 3.5rem 2.5rem 3rem 2.5rem; /* Large top padding for the icon */
+    padding: 3.5rem 2.5rem 3rem 2.5rem;
     width: 100%;
     max-width: 440px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
@@ -42,7 +39,6 @@
     margin: 4rem auto;
   }
 
-  /* The Circular Icon from the Image */
   .profile-icon {
     width: 100px;
     height: 100px;
@@ -115,8 +111,6 @@
     color: #94a3b8;
     background: none;
     border: none;
-    display: flex;
-    align-items: center;
   }
 
   /* ---------- BUTTONS ---------- */
@@ -135,16 +129,11 @@
     letter-spacing: 1px;
     box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.4);
   }
-  button.primary:hover:not(:disabled) { 
-    background-color: #2563eb; 
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-  }
-  button.primary:disabled { background-color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+  button.primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
 
-  /* ---------- DASHBOARD & TABLE ---------- */
+  /* ---------- DASHBOARD (UPDATED) ---------- */
   .dashboard-card { 
-    max-width: 950px !important; 
+    max-width: 1000px !important; 
     padding: 2.5rem !important;
     text-align: left;
   }
@@ -154,71 +143,45 @@
     background: #fff;
     border: 1px solid #e2e8f0;
     border-radius: 1rem;
-    overflow: hidden;
+    overflow-x: auto;
   }
 
-  table { width: 100%; border-collapse: collapse; }
-  th { background-color: #f8fafc; color: #475569; font-weight: 600; padding: 1.2rem 1rem; text-align: left; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; }
-  td { padding: 1.2rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; min-width: 600px; }
+  th { background-color: #f8fafc; color: #475569; font-weight: 600; padding: 1.2rem 1rem; text-align: left; font-size: 0.85rem; border-bottom: 2px solid #f1f5f9; }
+  td { padding: 1.2rem 1rem; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
 
-  .session-box {
+  .session-log-entry {
     background: #f1f5f9;
     border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    padding: 0.4rem 0.7rem;
+    border-radius: 0.6rem;
+    padding: 0.6rem;
     font-size: 0.75rem;
-    margin-bottom: 0.4rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    margin-bottom: 0.5rem;
   }
+  
+  .session-times { display: flex; flex-direction: column; gap: 2px; }
+  .time-label { font-weight: 700; color: #64748b; margin-right: 4px; }
 
   /* ---------- DARK MODE ---------- */
   body.dark-mode { background: #0f172a; }
-  .dark-mode .form-container { background: #1e293b; border: 1px solid #334155; }
+  .dark-mode .form-container { background: #1e293b; border: 1px solid #334151; }
   .dark-mode h2 { color: #f8fafc; }
-  .dark-mode input { background: #0f172a; border-color: #334155; color: #f8fafc; }
-  .dark-mode .profile-icon { background: #334155; border-color: #1e293b; }
+  .dark-mode input { background: #0f172a; border-color: #334151; color: #f8fafc; }
   .dark-mode .table-wrapper { background: #1e293b; border-color: #334155; }
-  .dark-mode th { background: #0f172a; color: #94a3b8; border-bottom-color: #334155; }
+  .dark-mode th { background: #0f172a; color: #94a3b8; }
   .dark-mode td { border-bottom-color: #334155; color: #cbd5e1; }
-  .dark-mode .session-box { background: #0f172a; border-color: #334155; }
+  .dark-mode .session-log-entry { background: #0f172a; border-color: #334155; }
 
-  /* ---------- UTILITIES ---------- */
-  .toast {
-    position: fixed; bottom: 2rem; right: 2rem;
-    background: #1e293b; color: white; padding: 1rem 1.5rem;
-    border-radius: 0.8rem; z-index: 100; opacity: 0;
-    transform: translateY(20px); transition: all 0.3s ease;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-  }
+  /* ---------- MODALS & TOAST ---------- */
+  .toast { position: fixed; bottom: 2rem; right: 2rem; background: #1e293b; color: white; padding: 1rem 1.5rem; border-radius: 0.8rem; z-index: 100; opacity: 0; transform: translateY(20px); transition: 0.3s; }
   .toast.show { opacity: 1; transform: translateY(0); }
-
-  .spinner {
-    width: 1.5rem; height: 1.5rem;
-    border: 3px solid rgba(255,255,255,0.3); border-radius: 50%;
-    border-top-color: #fff; animation: spin 0.8s linear infinite;
-  }
+  .spinner { width: 1.5rem; height: 1.5rem; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Modals */
   #modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index:90; display:none; }
-  #modal-container {
-    position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:#fff; z-index:100; padding:2.5rem; border-radius:1.5rem;
-    width:90%; max-width:440px; display:none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  }
+  #modal-container { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#fff; z-index:100; padding:2.5rem; border-radius:1.5rem; width:90%; max-width:440px; display:none; }
   .dark-mode #modal-container { background: #1e293b; color: #fff; }
 
-  /* Theme Toggle Top Button */
-  .theme-btn {
-    position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
-    background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.3); color: white;
-    padding: 0.6rem 1.5rem; border-radius: 2rem; font-size: 0.8rem;
-    font-weight: 600; cursor: pointer; z-index: 100; transition: 0.3s;
-  }
-  .theme-btn:hover { background: rgba(255,255,255,0.4); }
+  .theme-btn { position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.6rem 1.5rem; border-radius: 2rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; z-index: 100; }
 </style>
 </head>
 <body>
@@ -226,38 +189,27 @@
   <button class="theme-btn" id="theme-toggle">TOGGLE THEME</button>
 
   <div id="app-wrapper">
-
-    <!-- LOGIN SECTION -->
     <div class="form-container" id="login-view">
-      <div class="profile-icon">
-        <svg class="w-14 h-14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
-      </div>
+      <div class="profile-icon"><svg class="w-14 h-14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg></div>
       <h2>Login</h2>
-      
       <div class="input-group">
         <svg class="field-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
         <input type="text" id="username" placeholder="Username">
       </div>
-
       <div class="input-group">
         <svg class="field-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
         <input type="password" id="password" placeholder="Password">
         <button type="button" class="password-toggle" data-target="password">👁️</button>
       </div>
-
       <button id="login-btn" class="primary">LOGIN</button>
-
       <div class="mt-8 space-y-3">
         <div id="show-register" class="text-sm text-gray-500 cursor-pointer">New User? <span class="text-blue-500 font-bold hover:underline">Register Here</span></div>
         <div id="show-forgot" class="text-sm text-blue-500 font-bold cursor-pointer hover:underline">Forget Password?</div>
       </div>
     </div>
 
-    <!-- REGISTER SECTION -->
     <div class="form-container hidden" id="register-view">
-      <div class="profile-icon">
-        <svg class="w-14 h-14" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg>
-      </div>
+      <div class="profile-icon"><svg class="w-14 h-14" fill="currentColor" viewBox="0 0 20 20"><path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path></svg></div>
       <h2>Register</h2>
       <div class="input-group">
         <svg class="field-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
@@ -269,60 +221,42 @@
         <button type="button" class="password-toggle" data-target="reg-password">👁️</button>
       </div>
       <button id="register-btn" class="primary">REGISTER</button>
-      <div class="mt-6">
-        <div id="back-to-login" class="text-sm text-gray-500 cursor-pointer">Already have an account? <span class="text-blue-500 font-bold hover:underline">Login</span></div>
-      </div>
+      <div class="mt-6"><div id="back-to-login" class="text-sm text-gray-500 cursor-pointer">Back to <span class="text-blue-500 font-bold underline">Login</span></div></div>
     </div>
 
-    <!-- RESET PASSWORD SECTION -->
     <div class="form-container hidden" id="forgot-view">
-      <h2>Reset Password</h2>
-      <div class="input-group">
-        <input type="text" id="forgot-username" placeholder="Username" style="padding-left:1.5rem">
-      </div>
-      <div class="input-group">
-        <input type="password" id="forgot-new" placeholder="New Password" style="padding-left:1.5rem">
-      </div>
+      <h2>Reset</h2>
+      <div class="input-group"><input type="text" id="forgot-username" placeholder="Username" style="padding-left:1.5rem"></div>
+      <div class="input-group"><input type="password" id="forgot-new" placeholder="New Password" style="padding-left:1.5rem"></div>
       <button id="reset-btn" class="primary">UPDATE PASSWORD</button>
-      <div class="mt-6 text-blue-500 font-bold cursor-pointer hover:underline" id="back-login">Back to Login</div>
+      <div class="mt-6 text-blue-500 font-bold cursor-pointer underline" id="back-login">Back to Login</div>
     </div>
 
-    <!-- ADMIN CONTROL DASHBOARD -->
     <div class="form-container hidden dashboard-card" id="dashboard-view">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="!mb-0 !text-2xl !tracking-normal">Admin Control</h2>
+        <h2 class="!mb-0 !text-2xl">Admin Control</h2>
         <button id="admin-logout-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-600">LOGOUT</button>
       </div>
-      <div class="table-wrapper">
-        <div id="user-table-content"></div>
-      </div>
+      <div class="table-wrapper"><div id="user-table-content"></div></div>
     </div>
 
-    <!-- USER SUCCESS VIEW -->
     <div class="form-container hidden" id="user-view">
-      <div class="profile-icon !bg-green-100 !text-green-600">
-        <svg class="w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-      </div>
-      <h2>Authenticated</h2>
-      <p class="text-gray-400 text-sm mb-2">Welcome Back,</p>
+      <div class="profile-icon !bg-green-100 !text-green-600"><svg class="w-14 h-14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>
+      <h2>Welcome</h2>
       <h3 id="welcome-username" class="text-2xl font-bold text-blue-600 mb-10">User</h3>
       <button id="user-logout-btn" class="primary bg-gray-800 hover:bg-black">SIGN OUT</button>
     </div>
-
   </div>
 
-  <!-- Shared Assets -->
   <div class="toast" id="toast-msg"></div>
   <div id="modal-backdrop"></div>
   <div id="modal-container">
     <h3 id="modal-title" class="text-xl font-bold mb-4">Confirmation</h3>
     <p id="modal-message" class="text-gray-500 mb-8"></p>
-    <div id="modal-input-group" class="hidden mb-6">
-      <input type="text" id="modal-input" class="w-full p-4 border rounded-xl dark:bg-slate-900 dark:border-slate-700 outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type here...">
-    </div>
+    <div id="modal-input-group" class="hidden mb-6"><input type="text" id="modal-input" class="w-full p-4 border rounded-xl dark:bg-slate-900 outline-none"></div>
     <div class="flex justify-end gap-3">
-      <button id="modal-cancel-btn" class="px-6 py-3 bg-gray-100 dark:bg-slate-800 rounded-xl font-bold transition hover:bg-gray-200">Cancel</button>
-      <button id="modal-confirm-btn" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold transition hover:bg-blue-700">Confirm</button>
+      <button id="modal-cancel-btn" class="px-6 py-3 bg-gray-100 dark:bg-slate-800 rounded-xl font-bold">Cancel</button>
+      <button id="modal-confirm-btn" class="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold">Confirm</button>
     </div>
   </div>
 
@@ -332,13 +266,6 @@
   const toastEl = document.getElementById('toast-msg');
   let toastTimer;
 
-  // Modal references
-  const modalBackdrop = document.getElementById('modal-backdrop');
-  const modalContainer = document.getElementById('modal-container');
-  const modalInput = document.getElementById('modal-input');
-  let currentModalAction = null;
-
-  // Helper: Toast Notifications
   function showToast(msg) {
     clearTimeout(toastTimer);
     toastEl.textContent = msg;
@@ -346,250 +273,155 @@
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
   }
 
-  // Helper: View Switcher (Hides everything first)
   function showView(viewId) {
-    const ids = ['login-view','register-view','forgot-view','dashboard-view','user-view'];
-    ids.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.classList.add('hidden');
-    });
-    const target = document.getElementById(viewId);
-    if (target) target.classList.remove('hidden');
+    ['login-view','register-view','forgot-view','dashboard-view','user-view'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById(viewId).classList.remove('hidden');
   }
 
   function setLoading(btn, isLoading) {
     if (!btn) return;
-    if (isLoading) {
-      btn.dataset.text = btn.innerHTML;
-      btn.innerHTML = '<div class="flex justify-center"><div class="spinner"></div></div>';
-      btn.disabled = true;
-    } else {
-      btn.innerHTML = btn.dataset.text || 'SUBMIT';
-      btn.disabled = false;
-    }
+    if (isLoading) { btn.dataset.text = btn.innerHTML; btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true; }
+    else { btn.innerHTML = btn.dataset.text || 'SUBMIT'; btn.disabled = false; }
   }
 
-  // Navigation Setup
+  // Auth Functions
   document.getElementById('show-register').onclick = () => showView('register-view');
   document.getElementById('back-to-login').onclick = () => showView('login-view');
   document.getElementById('show-forgot').onclick = () => showView('forgot-view');
   document.getElementById('back-login').onclick = () => showView('login-view');
 
-  // --- CORE AUTH LOGIC ---
-
   const loginBtn = document.getElementById('login-btn');
   loginBtn.onclick = async () => {
-    const userVal = document.getElementById('username').value.trim();
-    const passVal = document.getElementById('password').value.trim();
-
-    if (!userVal || !passVal) return showToast('Please enter credentials.');
-
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    if (!user || !pass) return showToast('Enter credentials');
     setLoading(loginBtn, true);
     try {
-      const res = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: userVal, password: passVal })
-      });
+      const res = await fetch(`${API_URL}/login`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, password: pass}) });
       const data = await res.json();
-      
       if (res.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('session_id', data.session_id);
-        
-        if (data.role === 'admin') {
-          loadDashboard();
-        } else {
-          document.getElementById('welcome-username').textContent = userVal;
-          showView('user-view');
-        }
-      } else {
-        showToast(data.error || 'Invalid credentials.');
-      }
-    } catch (err) {
-      showToast('Error connecting to authentication service.');
-    } finally {
-      setLoading(loginBtn, false);
-    }
+        if (data.role === 'admin') loadDashboard();
+        else { document.getElementById('welcome-username').textContent = user; showView('user-view'); }
+      } else showToast(data.error);
+    } catch (e) { showToast('Connection Error'); }
+    finally { setLoading(loginBtn, false); }
   };
 
   const registerBtn = document.getElementById('register-btn');
   registerBtn.onclick = async () => {
     const user = document.getElementById('reg-username').value.trim();
     const pass = document.getElementById('reg-password').value.trim();
-    if (!user || !pass) return showToast('All fields required.');
-    
+    if (!user || !pass) return showToast('Fill all fields');
     setLoading(registerBtn, true);
     try {
-      const res = await fetch(`${API_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, password: pass })
-      });
-      if (res.ok) {
-        showToast('Registration successful!');
-        showView('login-view');
-      } else {
-        const d = await res.json();
-        showToast(d.error || 'Failed to create account.');
-      }
-    } catch (e) { showToast('Server connection error.'); }
-    finally { setLoading(registerBtn, false); }
+      const res = await fetch(`${API_URL}/register`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, password: pass}) });
+      if (res.ok) { showToast('Registered!'); showView('login-view'); }
+      else { const d = await res.json(); showToast(d.error); }
+    } catch (e) { showToast('Error'); } finally { setLoading(registerBtn, false); }
   };
 
   const resetBtn = document.getElementById('reset-btn');
   resetBtn.onclick = async () => {
     const user = document.getElementById('forgot-username').value.trim();
     const pass = document.getElementById('forgot-new').value.trim();
-    if (!user || !pass) return showToast('Enter username and new password.');
-    
     setLoading(resetBtn, true);
     try {
-      const res = await fetch(`${API_URL}/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, new_password: pass })
-      });
-      if (res.ok) {
-        showToast('Password updated successfully.');
-        showView('login-view');
-      } else showToast('Reset failed.');
-    } catch (e) { showToast('Connection failed.'); }
-    finally { setLoading(resetBtn, false); }
+      const res = await fetch(`${API_URL}/forgot-password`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: user, new_password: pass}) });
+      if (res.ok) { showToast('Success'); showView('login-view'); }
+      else showToast('Failed');
+    } catch (e) { showToast('Error'); } finally { setLoading(resetBtn, false); }
   };
 
-  // --- ADMIN DASHBOARD LOGIC ---
-
+  // Dashboard logic
   async function loadDashboard() {
     const token = localStorage.getItem('token');
-    if (!token) return showView('login-view');
-
     try {
-      const res = await fetch(`${API_URL}/admin/users`, {
-        headers: { 'x-access-token': token }
-      });
-      if (res.ok) {
-        const users = await res.json();
-        renderUsers(users);
-        showView('dashboard-view');
-      } else showView('login-view');
+      const res = await fetch(`${API_URL}/admin/users`, { headers: {'x-access-token': token} });
+      if (res.ok) { const users = await res.json(); renderUsers(users); showView('dashboard-view'); }
+      else showView('login-view');
     } catch (e) { showView('login-view'); }
   }
 
   function renderUsers(users) {
     const container = document.getElementById('user-table-content');
-    if (!users || users.length === 0) {
-      container.innerHTML = '<div class="p-10 text-center text-gray-400">No users found.</div>';
-      return;
-    }
-
-    const rows = users.map(user => {
-      const sessions = (user.sessions || []).map(s => `
-        <div class="session-box">
-          <span>${s.login_time}</span>
-          <button class="text-red-500 font-bold ml-3" onclick="deleteSession('${s._id}')">✕</button>
-        </div>`).join('') || '<div class="text-gray-300 text-xs italic">No activity</div>';
-
-      return `
-        <tr>
-          <td class="font-bold text-blue-600 dark:text-blue-400">${user.username}</td>
-          <td><div class="max-h-[150px] overflow-y-auto pr-2">${sessions}</div></td>
-          <td>
-            <div class="flex flex-col gap-2">
-              <button class="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold border border-red-100 hover:bg-red-100" onclick="deleteUser('${user._id}')">DELETE USER</button>
-              <button class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-100 hover:bg-blue-100" onclick="adminReset('${user._id}')">OVERWRITE PASS</button>
+    const rows = users.map(u => {
+      const sessions = (u.sessions || []).map(s => `
+        <div class="session-log-entry">
+          <div class="flex justify-between items-start">
+            <div class="session-times">
+              <div><span class="time-label">Login:</span> ${s.login_time}</div>
+              <div><span class="time-label">Logout:</span> ${s.logout_time || '-'}</div>
             </div>
-          </td>
-        </tr>`;
-    }).join('');
+            <button class="bg-red-500 text-white px-2 py-1 rounded text-[10px] ml-2" onclick="deleteSession('${s._id}')">Delete Session</button>
+          </div>
+        </div>`).join('') || '<span class="text-xs italic text-gray-400">No activity</span>';
 
-    container.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Sessions Log</th>
-            <th>Management</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>`;
+      return `<tr>
+        <td class="font-bold text-blue-600">${u.username}</td>
+        <td>${sessions}</td>
+        <td>
+          <div class="flex flex-col gap-2">
+            <button class="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold" onclick="deleteUser('${u._id}')">Delete User</button>
+            <button class="bg-yellow-100 text-yellow-700 px-3 py-1.5 rounded-lg text-xs font-bold" onclick="adminReset('${u._id}')">Reset Password</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+    container.innerHTML = `<table><thead><tr><th>Username</th><th>Sessions (Login & Logout)</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
   }
 
-  // Modal Actions
-  window.deleteUser = (id) => openModal('Confirm Deletion', 'Permanent removal of user and all history?', 'Delete', 'bg-red-600', async () => {
-    const token = localStorage.getItem('token');
-    await fetch(`${API_URL}/admin/user/${id}`, { method: 'DELETE', headers: { 'x-access-token': token } });
-    loadDashboard();
-  });
-
-  window.deleteSession = (id) => openModal('Remove Login', 'Delete this specific session entry?', 'Remove', 'bg-red-600', async () => {
-    const token = localStorage.getItem('token');
-    await fetch(`${API_URL}/admin/session/${id}`, { method: 'DELETE', headers: { 'x-access-token': token } });
-    loadDashboard();
-  });
-
-  window.adminReset = (id) => openModal('Password Overwrite', 'Type the new password for this account:', 'Save Changes', 'bg-blue-600', async (val) => {
-    const token = localStorage.getItem('token');
-    await fetch(`${API_URL}/admin/user/${id}/reset-password`, {
-      method: 'POST',
-      headers: { 'x-access-token': token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ new_password: val })
-    });
-    showToast('User password successfully overwritten.');
-  }, true);
-
-  // --- MODAL SYSTEM ---
+  // Modals & Admin actions
+  const modalBackdrop = document.getElementById('modal-backdrop');
+  const modalContainer = document.getElementById('modal-container');
+  const modalInput = document.getElementById('modal-input');
+  let currentModalAction = null;
 
   function openModal(title, msg, confirmText, btnClass, onConfirm, hasInput = false) {
     document.getElementById('modal-title').textContent = title;
     document.getElementById('modal-message').textContent = msg;
     const confirmBtn = document.getElementById('modal-confirm-btn');
     confirmBtn.textContent = confirmText;
-    confirmBtn.className = `px-8 py-3 text-white rounded-xl font-bold transition shadow-lg ${btnClass}`;
-    
+    confirmBtn.className = `px-6 py-3 text-white rounded-xl font-bold ${btnClass}`;
     document.getElementById('modal-input-group').classList.toggle('hidden', !hasInput);
     modalBackdrop.style.display = 'block';
     modalContainer.style.display = 'block';
-    if(hasInput) modalInput.focus();
     currentModalAction = () => onConfirm(modalInput.value.trim());
   }
 
-  document.getElementById('modal-cancel-btn').onclick = () => {
-    modalBackdrop.style.display = 'none';
-    modalContainer.style.display = 'none';
-    modalInput.value = '';
-    currentModalAction = null;
-  };
+  document.getElementById('modal-cancel-btn').onclick = () => { modalBackdrop.style.display = 'none'; modalContainer.style.display = 'none'; modalInput.value = ''; };
   document.getElementById('modal-confirm-btn').onclick = () => { if (currentModalAction) currentModalAction(); document.getElementById('modal-cancel-btn').onclick(); };
 
-  // --- LOGOUT & UTILS ---
+  window.deleteUser = (id) => openModal('Delete User', 'Delete this user account?', 'Delete', 'bg-red-600', async () => {
+    await fetch(`${API_URL}/admin/user/${id}`, { method: 'DELETE', headers: {'x-access-token': localStorage.getItem('token')} });
+    loadDashboard();
+  });
 
+  window.deleteSession = (id) => openModal('Delete Session', 'Remove this session record?', 'Remove', 'bg-red-600', async () => {
+    await fetch(`${API_URL}/admin/session/${id}`, { method: 'DELETE', headers: {'x-access-token': localStorage.getItem('token')} });
+    loadDashboard();
+  });
+
+  window.adminReset = (id) => openModal('Reset Password', 'Enter new password:', 'Reset', 'bg-blue-600', async (v) => {
+    await fetch(`${API_URL}/admin/user/${id}/reset-password`, { method: 'POST', headers: {'x-access-token': localStorage.getItem('token'), 'Content-Type': 'application/json'}, body: JSON.stringify({new_password: v}) });
+    showToast('Updated');
+  }, true);
+
+  // Logout & Themes
   async function performLogout() {
     const sid = localStorage.getItem('session_id');
-    if (sid) { try { await fetch(`${API_URL}/logout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sid }) }); } catch (e) {} }
-    localStorage.clear();
-    showView('login-view');
-    showToast('Logged out successfully.');
+    try { await fetch(`${API_URL}/logout`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({session_id: sid}) }); } catch (e) {}
+    localStorage.clear(); showView('login-view'); showToast('Signed out');
   }
   document.getElementById('admin-logout-btn').onclick = performLogout;
   document.getElementById('user-logout-btn').onclick = performLogout;
 
-  document.getElementById('theme-toggle').onclick = () => {
-    document.body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-  };
+  document.getElementById('theme-toggle').onclick = () => { document.body.classList.toggle('dark-mode'); localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); };
   if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
 
-  document.querySelectorAll('.password-toggle').forEach(btn => {
-    btn.onclick = () => {
-      const input = document.getElementById(btn.dataset.target);
-      input.type = input.type === 'password' ? 'text' : 'password';
-    };
-  });
-
+  document.querySelectorAll('.password-toggle').forEach(btn => btn.onclick = () => { const input = document.getElementById(btn.dataset.target); input.type = input.type === 'password' ? 'text' : 'password'; });
 })();
 </script>
 </body>
 </html>
-
